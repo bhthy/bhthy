@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - controllers/users.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>controllers/users.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">66.30</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">205</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">39.78</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.95</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">&#039;use strict&#039;;
+ /**
+  * @ngdoc function
+  * @name getlancerApp.controller:UsersController
+  * @description
+  * # UsersController
+  * Controller of the getlancerApp
+  */
+ angular.module(&#039;getlancerApp&#039;)
+     .controller(&#039;UsersController&#039;, [&#039;$rootScope&#039;, &#039;$scope&#039;, &#039;$state&#039;, &#039;UserProfile&#039;, &#039;FreelancerSkills&#039;, &#039;md5&#039;, &#039;$filter&#039;, &#039;$uibModalStack&#039;,&#039;$uibModal&#039;, function($rootScope, $scope, $state, UserProfile, FreelancerSkills, md5, $filter, $uibModalStack, $uibModal) {
+         $rootScope.header = $rootScope.settings.SITE_NAME + &#039; | &#039; + $filter(&quot;translate&quot;)(&quot;Browse Freelancers&quot;);
+         $scope.data = {};
+         $scope.search_value = {};
+         /*  search freelancer function*/
+         $scope.freelancerSearch = function(data) {
+             if (angular.isDefined(data.skill_select)) {
+                 var skills = [];
+                 angular.forEach(data.skill_select, function(value) {
+                     skills.push(value.id);
+                 });
+                 data.skills = skills.toString();
+             }
+             $scope.params.q = data.q;
+             $scope.params.skills = data.skills;
+             $scope.params.hourly_rate = data.hourly_rate;
+             $state.go(&#039;Users&#039;, $scope.params);
+         };
+         $scope.data.q = $state.params.q;
+         $scope.data.hourly_rate = $state.params.hourly_rate;
+         $scope.data.skills = $state.params.skills;
+         //$scope.search_value = data;
+         if ($state.params.hourly_rate === &#039;hourly_rate_min&#039;) {
+             $scope.search_value.hourly_rate_min = 0;
+             $scope.search_value.hourly_rate_max = 9;
+         } else if ($state.params.hourly_rate === &#039;hourly_rate_minimum&#039;) {
+             $scope.search_value.hourly_rate_min = 10;
+             $scope.search_value.hourly_rate_max = 20;
+         } else if ($state.params.hourly_rate === &#039;hourly_rate_medium&#039;) {
+             $scope.search_value.hourly_rate_min = 21;
+             $scope.search_value.hourly_rate_max = 30;
+         } else if ($state.params.hourly_rate === &#039;hourly_rate_max&#039;) {
+             $scope.search_value.hourly_rate_min = 31;
+             $scope.search_value.hourly_rate_max = 40;
+         } else if ($state.params.hourly_rate === &#039;hourly_rate_maximum&#039;) {
+             $scope.search_value.hourly_rate_min = 41;
+         } else {}
+         /*  user details get function */
+         function usersDetail() {
+             $scope.loader = true;
+             $scope.params = {};
+             $scope.rating_value = 0;
+             $scope.params.page = ($scope.currentPage !== undefined) ? $scope.currentPage : 1;
+             $scope.params.role = &#039;freelancer&#039;;
+             $scope.params.q = $state.params.q;
+             $scope.params.skills = $state.params.skills;
+             $scope.params.hourly_rate_min = $scope.search_value.hourly_rate_min;
+             $scope.params.hourly_rate_max = $scope.search_value.hourly_rate_max;
+             UserProfile.getbyId($scope.params, function(response) {
+                  if (angular.isDefined(response._metadata)) {
+                    $scope.currentPage = response._metadata.current_page;
+                    $scope.totalItems = response._metadata.total;
+                    $scope.itemsPerPage = response._metadata.per_page;
+                    $scope.noOfPages = response._metadata.last_page;
+                }
+                 $scope.loader = false;
+                 $scope.users = response.data;
+                 angular.forEach($scope.users, function(user) {
+                     if (user.attachment !== null) {
+                         user.users_avatar_url = &#039;images/big_thumb/UserAvatar/&#039; + user.id + &#039;.&#039; + md5.createHash(&#039;UserAvatar&#039; + user.id + &#039;png&#039; + &#039;big_thumb&#039;) + &#039;.png&#039;;
+                     } else {
+                         user.users_avatar_url = &#039;images/default.png&#039;;
+                     }
+                     $scope.exam_users = user.exams_users;
+                     angular.forEach($scope.exam_users, function(exams) {
+                         $scope.total_mark = Number(exams.total_mark || 0);
+                         $scope.total_question_count = Number(exams.total_question_count || 0);
+                         $scope.average = $scope.total_mark / $scope.total_question_count;
+                         exams.exam_user_per = parseInt($scope.average * 100);
+                         if (angular.isDefined(exams.exam.attachment) &amp;&amp; exams.exam.attachment !== null) {
+                             exams.exam_image = &#039;images/small_normal_thumb/Exam/&#039; + exams.exam.attachment.foreign_id + &#039;.&#039; + md5.createHash(&#039;Exam&#039; + exams.exam.attachment.foreign_id + &#039;png&#039; + &#039;small_normal_thumb&#039;) + &#039;.png&#039;;
+                         } else {
+                             exams.exam_image = &#039;images/no-image.png&#039;;
+                         }
+                     });
+                 });
+             });
+         }
+         $scope.showhideSkills = function(id, is_show) {
+             var skillId = &#039;skills-&#039; + id;
+             if (parseInt(is_show) === 1) {
+                 $(&#039;#&#039; + skillId) //jshint ignore:line
+                     .attr(&#039;style&#039;, &#039;display:block&#039;);
+             } else {
+                 $(&#039;.user-certificate-skills&#039;) //jshint ignore:line
+                     .attr(&#039;style&#039;, &#039;display:none&#039;);
+             }
+         };
+         /*skills listing get funtion*/
+         var params = {};
+         params.limit = &#039;all&#039;;
+         FreelancerSkills.get(params, function(response) {
+             $scope.loader = false;
+             if (parseInt(response.error.code) === 0) {
+                 $scope.userSkill = [];
+                 $scope.userSkills = response.data;
+                 $scope.data.skill_select = [];
+                 var selectedSkill = &quot;&quot;;
+                 if (angular.isDefined($state.params.skills)) {
+                     selectedSkill = $state.params.skills.split(&#039;,&#039;);
+                 }
+                 angular.forEach($scope.userSkills, function(value) {
+                     $scope.skillName = value.name;
+                     $scope.userSkill.push({
+                         id: value.id,
+                         text: value.name
+                     });
+                     if (selectedSkill !== &quot;&quot; &amp;&amp; selectedSkill.indexOf(value.id.toString()) !== -1) {
+                         $scope.data.skill_select.push({
+                             id: value.id,
+                             text: value.name
+                         });
+                     }
+                 });
+             } else {
+                 console.log(&#039;Skills Error&#039;);
+             }
+         }, function(error) {
+             console.log(&#039;Skills Error&#039;, error);
+             
+         });
+         /*load skills in search */
+         $scope.loadSkills = function(qstr) {
+             qstr = qstr.toLowerCase();
+             var items = [];
+             var name;
+             angular.forEach($scope.userSkill, function(value) {
+                 name = value.text.toLowerCase();
+                 if (name.indexOf(qstr) &gt;= 0) {
+                     items.push({
+                         id: value.id,
+                         text: value.text
+                     });
+                 }
+             });
+             return items;
+         };
+          $scope.paginate = function() {
+            $scope.currentPage = parseInt($scope.currentPage);
+            usersDetail();
+        };
+         /*hire me option*/
+         var flashMessage = &quot;&quot;;
+          $scope.HireMe = function($other_user_id) {              
+            $scope.modalInstance = $uibModal.open({
+                templateUrl: &#039;views/hire_me.html&#039;,
+                animation: false,
+                controller: function($scope, $rootScope, $window, $stateParams, $filter, md5, $state, Upload, $timeout, $uibModal, $uibModalStack, ActiveProjects, UserProfile, HireMe, flash) {
+                    var params = {};
+                    params.id = $rootScope.user.id;
+                    ActiveProjects.getall(params, function(response) {
+                        $scope.projects = response.data;
+                    });
+                    $rootScope.closemodel = function() {
+                        $state.go(&#039;Users&#039;);
+                        $uibModalStack.dismissAll();
+                    };
+                    $scope.project_select = [];
+                    $scope.check = function(value, checked) {
+                        var idx = $scope.project_select.indexOf(value);
+                        if (idx &gt;= 0 &amp;&amp; !checked) {
+                            $scope.project_select.splice(idx, 1);
+                        }
+                        if (idx &lt; 0 &amp;&amp; checked) {
+                            $scope.project_select.push(value);
+                        }
+                    };
+                    $scope.submit = function() {
+                        $scope.tmp_skills = [];
+                        angular.forEach($scope.project_select, function(id) {
+                            $scope.tmp_skills.push({
+                                &#039;project_id&#039;: id
+                            });
+                        });
+                        var params = {};
+                        params.projects = $scope.tmp_skills;
+                        params.message = $scope.message;
+                        params.class = &#039;Project&#039;;
+                        params.user_id = $other_user_id;
+                        HireMe.create(params, function(response) {
+                            $scope.closemodel();
+                            if (response.error.code === 0) {
+                                flashMessage = $filter(&quot;translate&quot;)(&quot;Message sent successfully.&quot;);
+                                flash.set(flashMessage, &#039;success&#039;, false);
+                            } else {
+                                flashMessage = $filter(&quot;translate&quot;)(response.error.message);
+                                flash.set(flashMessage, &#039;error&#039;, false);
+                            }
+                        });
+                    };
+                },
+                size: &#039;lg&#039;
+            });
+        };
+         usersDetail();
+         }]);</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

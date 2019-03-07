@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="styles/admin.cache.css">
+    <title ng-bind-html="settings.SITE_NAME + ' | Admin'"></title>
+</head>
+
+<body class="blur-theme">
+    <main ng-class="{ 'menu-collapsed': $baSidebarService.isMenuCollapsed() }" class="auth-main js-collaps-main">
+    <div ui-view class="wid-100"></div>
+    <script src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyBvXPoR4YXSSib7aucIvrYHrmMknzMEaHM"></script>
+    <script src="scripts/vendor.cache.js"></script>
+    <script src="scripts/admin.cache.js"></script>
+    </main>
+</body>
+
+</html>

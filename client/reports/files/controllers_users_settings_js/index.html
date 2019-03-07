@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - controllers/users_settings.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>controllers/users_settings.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">61.07</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">149</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">31.88</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.31</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">&#039;use strict&#039;;
+/**
+ * @ngdoc function
+ * @name getlancerApp.controller:UsersSettingsController
+ * @description
+ * # UsersSettingsController
+ * Controller of the getlancerApp
+ */
+angular.module(&#039;getlancerApp&#039;)
+    .controller(&#039;UsersSettingsController&#039;, [&#039;$rootScope&#039;, &#039;$scope&#039;, &#039;userSettings&#039;, &#039;flash&#039;, &#039;$filter&#039;, &#039;md5&#039;, &#039;Upload&#039;, &#039;$location&#039;, &#039;$cookies&#039;, function ($rootScope, $scope, userSettings, flash, $filter, md5, Upload, $location,  $cookies) {
+        $rootScope.header = $rootScope.settings.SITE_NAME + &#039; | &#039; + $filter(&quot;translate&quot;)(&quot;Profile&quot;);
+        $scope.save_btn = false;
+        $rootScope.url_split = $location.path().split(&quot;/&quot;)[2];
+            if ($cookies.get(&quot;auth&quot;) !== null &amp;&amp; $cookies.get(&quot;auth&quot;) !== undefined) {
+                $scope.auth_user_detail = $cookies.getObject(&quot;auth&quot;);
+            }
+        $scope.save = function (form) {
+            if (form &amp;&amp; !$scope.save_btn) {
+                $scope.save_btn = true;
+                $scope.usersSettings.id = $rootScope.user.id;
+                var user_details = {};
+                user_details.id = $rootScope.user.id;
+                user_details = $scope.usersSettings;
+                userSettings.update(user_details, function (response) {
+                    $scope.response = response;
+                    if ($scope.response.error.code === 0) {
+                        $cookies.remove(&#039;auth&#039;);
+                        $scope.Authuser = { 
+                         id: $scope.auth_user_detail.id,
+                         username: $scope.auth_user_detail.username,
+                         role_id: $scope.auth_user_detail.role_id,
+                         refresh_token: $scope.auth_user_detail.refresh_token,
+                         attachment: user_details.attachment
+                    };
+                    $cookies.put(&#039;auth&#039;, JSON.stringify($scope.Authuser), {
+                                    path: &#039;/&#039;
+                                });
+                        flash.set($filter(&quot;translate&quot;)(&quot;User Profile has been updated.&quot;), &#039;success&#039;, false);
+                    } else {
+                        flash.set($filter(&quot;translate&quot;)(&quot;User Profile could not be updated. Please try again.&quot;), &#039;error&#039;, false);
+                    }
+                    $scope.save_btn = false;
+                });
+            }
+        };
+        $scope.index = function () {
+            var params = {};
+            params.id = $rootScope.user.id;
+            userSettings.get(params, function (response) {
+                $scope.usersSettings = response.data;
+                $scope.usersSettings.zip_code = response.data.zip_code;
+                $scope.place = $scope.usersSettings.full_address;
+                $scope.usersSettings.hourly_rate = parseInt($scope.usersSettings.hourly_rate);
+                delete $scope.usersSettings.image_name;
+                if (angular.isDefined(response.data.attachment) &amp;&amp; response.data.attachment !== null) {
+                    var c = new Date();
+                    var hash = md5.createHash(response.data.attachment.class + response.data.attachment.foreign_id + &#039;png&#039; + &#039;normal_thumb&#039;);
+                    $scope.usersSettings.image_name = &#039;images/normal_thumb/&#039; + response.data.attachment.class + &#039;/&#039; + response.data.attachment.foreign_id + &#039;.&#039; + hash + &#039;.png?&#039; + c.getTime();
+                }
+                $scope.gender_type = [
+                    {
+                        name: $filter(&quot;translate&quot;)(&quot;Male&quot;),
+                        value: 1
+                    },
+                    {
+                        name: $filter(&quot;translate&quot;)(&quot;Female&quot;),
+                        value: 2
+                    }
+                ];
+            });
+        };
+        $scope.location = function () {
+            $scope.usersSettings.city = {};
+            $scope.usersSettings.state = {};
+            $scope.usersSettings.country = {};
+            var k = 0;
+            if ($scope.place !== undefined) {
+                angular.forEach($scope.place.address_components, function (value) {
+                    if (value.types[0] === &#039;locality&#039; || value.types[0] === &#039;administrative_area_level_2&#039;) {
+                        if (value.types[0] === &#039;locality&#039;) {
+                            k = 1;
+                        }
+                    }
+                    if (value.types[0] === &#039;administrative_area_level_1&#039;) {
+                        $scope.usersSettings.city.name = value.long_name;
+                        //   $scope.disable_state = true;
+                    }
+                    if (value.types[0] === &#039;administrative_area_level_1&#039;) {
+                        $scope.usersSettings.state.name = value.long_name;
+                        //  $scope.disable_state = true;
+                    }
+                    if (value.types[0] === &#039;country&#039;) {
+                        $scope.usersSettings.country.iso_alpha2 = value.short_name;
+                        //   $scope.disable_country = true;
+                    }
+                    if (value.types[0] === &#039;postal_code&#039;) {
+                        $scope.disable_zip = true;
+                        $scope.required_message = &#039;&#039;;
+                        $scope.usersSettings.zip_code = parseInt(value.long_name);
+                    } else {
+                        $scope.disable_zip = false;
+                        $scope.usersSettings.zip_code = &#039;&#039;;
+                        $scope.country_zip_code = (parseInt(value.long_name) ||0);
+                        if ($scope.country_zip_code === 0) {
+                            $scope.required_message = &#039;Required&#039;;
+                        } else {
+                            $scope.required_message = &#039;&#039;;
+                        }
+
+                    }
+                    $scope.usersSettings.latitude = $scope.place.geometry.location.lat();
+                    $scope.disable_latitude = true;
+                    $scope.usersSettings.longitude = $scope.place.geometry.location.lng();
+                    $scope.disable_longitude = true;
+                    $scope.usersSettings.address = $scope.place.name + &quot; &quot; + $scope.place.vicinity;
+                    $scope.usersSettings.full_address = $scope.place.formatted_address;
+                });
+            }
+        };
+        $scope.index();
+        $scope.uploadUserAvatare = function (file) {
+            angular.element(&#039;#custom-upload&#039;)
+                .val(file.name);
+            Upload.upload({
+                url: &#039;/api/v1/attachments?class=UserAvatar&#039;,
+                data: {
+                    file: file
+                }
+            })
+                .then(function (response) {
+                    if (response.data.error.code === 0) {
+                        var user_image = {};
+                        user_image.image = response.data.attachment;
+                        user_image.id = $rootScope.user.id;
+                        $scope.error_message = &#039;&#039;;
+                        userSettings.update(user_image, function (response) {
+                            if (angular.isDefined(response.data.attachment) &amp;&amp; response.data.attachment !== null) {
+                                var c = new Date();
+                                var hash = md5.createHash(response.data.attachment.class + response.data.attachment.foreign_id + &#039;png&#039; + &#039;normal_thumb&#039;);
+                                $rootScope.user.userimage = &#039;images/normal_thumb/&#039; + response.data.attachment.class + &#039;/&#039; + response.data.attachment.foreign_id + &#039;.&#039; + hash + &#039;.png?&#039; + c.getTime();
+                                $scope.usersSettings.image_name = &#039;images/normal_thumb/&#039; + response.data.attachment.class + &#039;/&#039; + response.data.attachment.foreign_id + &#039;.&#039; + hash + &#039;.png?&#039; + c.getTime();
+                            }
+                        });
+                    } else {
+                        $scope.error_message = response.data.error.message;
+                    }
+                });
+        };
+    }]);</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

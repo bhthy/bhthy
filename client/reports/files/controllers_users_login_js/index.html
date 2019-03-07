@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - controllers/users_login.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>controllers/users_login.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">53.73</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">498</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">89.81</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">9.49</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">&#039;use strict&#039;;
+/**
+ * @ngdoc function
+ * @name getlancerApp.controller:UsersLoginController
+ * @description
+ * # UsersLoginController
+ * Controller of the getlancerApp
+ */
+angular.module(&#039;getlancerApp&#039;)
+    .controller(&#039;UsersLoginController&#039;, [&#039;$rootScope&#039;, &#039;$scope&#039;, &#039;usersLogin&#039;, &#039;providers&#039;, &#039;$auth&#039;, &#039;flash&#039;, &#039;$window&#039;, &#039;$location&#039;, &#039;$filter&#039;, &#039;$cookies&#039;, &#039;$state&#039;, &#039;$uibModalStack&#039;, &#039;$timeout&#039;, &#039;ConstUserRole&#039;, &#039;myUserFactory&#039;, &#039;ConstQuoteStatuses&#039;, function($rootScope, $scope, usersLogin, providers, $auth, flash, $window, $location, $filter, $cookies, $state, $uibModalStack, $timeout, ConstUserRole, myUserFactory, ConstQuoteStatuses) {
+        $rootScope.header = $rootScope.settings.SITE_NAME + &#039; | &#039; + $filter(&quot;translate&quot;)(&quot;Login&quot;);
+        $scope.ConstUserRole = ConstUserRole;
+        $scope.ConstQuoteStatuses = ConstQuoteStatuses;
+        /* init function */
+
+        $scope.init = function() {
+            var current_state = $state.current.name;
+            $timeout(function() {
+                if (current_state === &#039;users_login&#039;) {
+                    $rootScope.header = $rootScope.settings.SITE_NAME + &#039; | &#039; + $filter(&quot;translate&quot;)(&quot;Login&quot;);
+                }
+            }, 100);
+        };
+        $scope.init();
+
+       /* $cookies.get(&#039;auth&#039;) set*/
+
+        if ($cookies.get(&#039;auth&#039;) !== null &amp;&amp; $cookies.get(&#039;auth&#039;) !== undefined) {
+            $rootScope.$emit(&#039;updateParent&#039;, {
+
+                isAuth: true
+            });
+            $rootScope.header = $rootScope.settings.SITE_NAME + &#039; | Home&#039;;
+            if ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Portfolio/Portfolio&#039;) &gt; -1 === true &amp;&amp; ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Quote/Quote&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Job/Job&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Contest/Contest&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Bidding/Bidding&#039;) &gt; -1 === false)) {
+                $state.go(&#039;user_dashboard&#039;, {
+                            &#039;type&#039;: &#039;news_feed&#039;,
+                            &#039;status&#039;: &#039;news_feed&#039;,
+                        });
+            } else {
+                $state.go(&#039;user_dashboard&#039;, {
+                        &#039;type&#039;: &#039;news_feed&#039;,
+                        &#039;status&#039;: &#039;news_feed&#039;,
+                    });
+            }
+        }
+          
+        $scope.user = {};
+        $scope.save_btn = false;
+            $scope.forgot_password = function(){
+                $location.path(&#039;users/forgot_password&#039;);
+                
+            };
+        /* normal login submit function */
+        $scope.save = function($event) {
+            if ($event === undefined || $event.keyCode === 13) {
+                $scope.userLogin.$submitted = true;
+                if ($scope.userLogin.$valid &amp;&amp; !$scope.save_btn) {
+                    $scope.save_btn = true;
+                     /*  For login username or email check */
+                     if ($rootScope.settings.USER_USING_TO_LOGIN === &#039;username&#039;) {
+                        $scope.user.username = $scope.user_name;
+                    }
+                    if ($rootScope.settings.USER_USING_TO_LOGIN === &#039;email&#039;) {
+                        $scope.user.email = $scope.user_name;
+                    }
+                   /* user login post factory */
+                    usersLogin.login($scope.user, function(response) {
+                            $scope.userLogin.$setPristine();
+                            $scope.userLogin.$setUntouched();
+                            $scope.response = response;
+                            delete $scope.response.scope;
+                            if ($scope.response.error.code === 0) {
+
+                              /* login user details get factory*/
+                                myUserFactory.get(function(response) {
+                                    $rootScope.my_user = response.data;
+                                        $rootScope.my_user.available_wallet_amount = Number
+                                        ($rootScope.my_user.available_wallet_amount||0);
+                                });
+                                $timeout(function() {
+                                      $scope.UserDetails  = $scope.my_user;
+                                    }, 500);
+                              /*  For empolyer login*/
+                            $timeout(function() {
+                            //   if ($scope.UserDetails.user_login_count === &#039;1&#039;)
+                            //     {
+                            //         $window.location.href = &#039;users/&#039; + $scope.UserDetails.id + &#039;/&#039; + $scope.UserDetails.username;
+                            //     } 
+                                 if ($scope.response.role_id === $scope.ConstUserRole.Employer) {
+                                        $rootScope.Employer = true;
+                                        $rootScope.Freelancer = false;
+                                        if ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Portfolio/Portfolio&#039;) &gt; -1 === true &amp;&amp; ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Quote/Quote&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Job/Job&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Contest/Contest&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Bidding/Bidding&#039;) &gt; -1 === false)) {
+                                            if ($rootScope.Freelancer) {
+                                                /* only portfolio plukin enabled */
+                                            $state.go(&#039;user_dashboard&#039;, {
+                                                                    &#039;type&#039;: &#039;news_feed&#039;,
+                                                                    &#039;status&#039;: &#039;news_feed&#039;,
+                                                                });
+                                            } else {
+                                                 $state.go(&#039;user_dashboard&#039;, {
+                                                                    &#039;type&#039;: &#039;news_feed&#039;,
+                                                                    &#039;status&#039;: &#039;news_feed&#039;,
+                                                                });
+                                            }
+                                        } else if ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Quote/Quote&#039;) &gt; -1 === true &amp;&amp; ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Portfolio/Portfolio&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Job/Job&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Contest/Contest&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Bidding/Bidding&#039;) &gt; -1 === false)) {
+                                      
+                                            /* only quote plukin enabled */
+                                                if ($rootScope.Employer &amp;&amp; $scope.UserDetails.quote_request_count === &#039;0&#039;) {
+                                                    $location.path(&#039;/quote_services&#039;);
+                                                }else{
+                                                    $location.path(&#039;/quote_bids/my_requests/all/&#039; + $scope.ConstQuoteStatuses.UnderDiscussion + &#039;/under_discussion&#039;);
+                                                }
+                                    
+                                        } else if ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Portfolio/Portfolio&#039;) &gt; -1 === true ||     $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Quote/Quote&#039;) &gt; -1 === true ||
+                                        $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Bidding/Bidding&#039;) &gt; -1 === true) {
+                                           $state.go(&#039;user_dashboard&#039;, {
+                                                                        &#039;type&#039;: &#039;news_feed&#039;,
+                                                                        &#039;status&#039;: &#039;news_feed&#039;,
+                                                                    });
+                                        }
+                                         else if ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Job/Job&#039;) &gt; -1 === true &amp;&amp; ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Quote/Quote&#039;) &gt; -1 === false, 
+                                        $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Bidding/Bidding&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Contest/Contest&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Portfolio/Portfolio&#039;) &gt; -1 === false)) {
+                                                                     $state.go(&#039;user_dashboard&#039;, {
+                                                                        &#039;type&#039;: &#039;my_jobs&#039;,
+                                                                        &#039;status&#039;: &#039;all&#039;,
+                                                                    });
+                                        }
+                                        else {
+                                            $state.go(&#039;user_dashboard&#039;);
+                                        }
+                                    } else {
+                                    /* freelancer login */
+                                        $rootScope.Freelancer = true;
+                                        $rootScope.Employer = false;
+                                        $window.localStorage.setItem(&quot;portal&quot;, JSON.stringify(&#039;Freelancer&#039;));
+                                        if ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Portfolio/Portfolio&#039;) &gt; -1 === true &amp;&amp; ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Quote/Quote&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Job/Job&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Contest/Contest&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Bidding/Bidding&#039;) &gt; -1 === false)) {
+                                            if ($rootScope.Freelancer) {
+                                            /* only portfolio plukin enabled */
+                                                $state.go(&#039;user_dashboard&#039;, {
+                                                &#039;type&#039;: &#039;news_feed&#039;,
+                                                &#039;status&#039;: &#039;news_feed&#039;,
+                                            });
+                                            } else {
+                                            $state.go(&#039;user_dashboard&#039;, {
+                                                &#039;type&#039;: &#039;news_feed&#039;,
+                                                &#039;status&#039;: &#039;news_feed&#039;,
+                                            });
+                                            }
+                                        } else if ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Quote/Quote&#039;) &gt; -1 === true &amp;&amp; ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Portfolio/Portfolio&#039;) &gt; -1 === false, 
+                                        $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Job/Job&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Contest/Contest&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Bidding/Bidding&#039;) &gt; -1 === false)) {
+                                            
+                                            /* only quote plukin enabled */
+                                            if ($rootScope.Freelancer &amp;&amp; $scope.UserDetails.quote_service_count === &#039;0&#039; ) {
+                                                $state.go(&#039;quote_service_add&#039;);
+                                                }else{
+                                                    $location.path(&#039;/my_works/all/&#039; + $scope.ConstQuoteStatuses.New + &#039;/new&#039;);
+                                                }
+                                        }  
+                                        else if ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Portfolio/Portfolio&#039;) &gt; -1 === true ||     $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Quote/Quote&#039;) &gt; -1 === true ||
+                                        $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Bidding/Bidding&#039;) &gt; -1 === true) {
+                                            $state.go(&#039;user_dashboard&#039;, {
+                                                                    &#039;type&#039;: &#039;news_feed&#039;,
+                                                                    &#039;status&#039;: &#039;news_feed&#039;,
+                                                                });
+                                        }  else if ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Job/Job&#039;) &gt; -1 === true &amp;&amp; ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Quote/Quote&#039;) &gt; -1 === false, 
+                                        $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Portfolio/Portfolio&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Contest/Contest&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Bidding/Bidding&#039;) &gt; -1 === false)) {
+                                              $state.go(&#039;user_dashboard&#039;, {
+                                                                        &#039;type&#039;: &#039;jobs_applies&#039;,
+                                                                        &#039;status&#039;: &#039;all&#039;,
+                                                                    });
+                                        }  
+                                        else {
+                                            $state.go(&#039;user_dashboard&#039;);
+                                        }
+                                    }
+                            }, 500);
+                                $scope.Authuser = {
+                                    id: $scope.response.id,
+                                    username: $scope.response.username,
+                                    role_id: $scope.response.role_id,
+                                    refresh_token: $scope.response.refresh_token,
+                                    attachment: $scope.response.attachment,
+                                };
+                                $cookies.put(&#039;auth&#039;, JSON.stringify($scope.Authuser), {
+                                    path: &#039;/&#039;
+                                });
+                                $cookies.put(&#039;token&#039;, $scope.response.access_token, {
+                                    path: &#039;/&#039;
+                                });
+                                $rootScope.$broadcast(&#039;updateParent&#039;, {
+                                    isAuth: true,
+                                    auth: $scope.response
+                                });
+                                if ($cookies.get(&quot;redirect_url&quot;) !== null &amp;&amp; $cookies.get(&quot;redirect_url&quot;) !== undefined &amp;&amp; $cookies.get(&quot;redirect_url&quot;) !== &#039;/&#039;) {                 
+                                    $uibModalStack.dismissAll();
+                                    $location.path($cookies.get(&quot;redirect_url&quot;));
+                                    $cookies.remove(&quot;redirect_url&quot;, {
+                                        path: &quot;/&quot;
+                                    });
+                                } else {
+                                    $uibModalStack.dismissAll();
+                                }
+                            } else {
+                                flash.set($filter(&quot;translate&quot;)(&quot;Sorry, login failed. Either your username or password are incorrect or admin deactivated your account.&quot;), &#039;error&#039;, false);
+                                $scope.save_btn = false;
+                                $scope.user = {};
+                            }
+                        }, //jshint unused:false 
+                        function(error) {
+                            flash.set($filter(&quot;translate&quot;)(&quot;Sorry, login failed. Either your username or password are incorrect or admin deactivated your account.&quot;), &#039;error&#039;, false);
+                            $scope.save_btn = false;
+                        });
+                }
+            }
+        };
+
+       /* social login submit function*/
+        $scope.authenticate = function(provider) {
+            $scope.social_login_provider = provider;
+             $cookies.put(&#039;provider_name&#039;, $scope.social_login_provider);
+            $auth.authenticate(provider)
+                .then(function(response) {
+                    $scope.response = response.data;
+                              /* login user details get factory*/
+                  
+                        if ($scope.response.already_register === &#039;1&#039;) {
+                             myUserFactory.get(function(response) {
+                                    $rootScope.my_auth_user = response.data;
+                                });
+                                  $timeout(function() {
+                            if ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Portfolio/Portfolio&#039;) &gt; -1 === false &amp;&amp; ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Quote/Quote&#039;) &gt; -1 === true, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Job/Job&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Contest/Contest&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Bidding/Bidding&#039;) &gt; -1 === false)) {
+                                if ($scope.response.role_id === ConstUserRole.Freelancer) {
+                                    $window.location.href = &#039;my_works&#039;;
+                                } else if ($scope.response.role_id === ConstUserRole.Employer) {
+                                    $window.location.href = &#039;quote_bids/my_requests/all/&#039; + $scope.ConstQuoteStatuses.UnderDiscussion + &#039;/under_discussion&#039;;
+                                } else {
+                                    $window.location.href = &#039;users/dashboard&#039;;
+                                }
+                            }
+                            if (($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Portfolio/Portfolio&#039;) &gt; -1 === false &amp;&amp; $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Quote/Quote&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Job/Job&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Contest/Contest&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Bidding/Bidding&#039;) &gt; -1 === true) &amp;&amp; $rootScope.my_auth_user.user_login_count === &#039;1&#039;) {
+                              $window.location.href = &#039;users/&#039; + $rootScope.my_auth_user.id + &#039;/&#039; + $rootScope.my_auth_user.username;
+                            }
+                               else if ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Portfolio/Portfolio&#039;) &gt; -1 === true ||     $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Quote/Quote&#039;) &gt; -1 === true ||
+                                        $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Bidding/Bidding&#039;) &gt; -1 === true &amp;&amp; $rootScope.my_auth_user.user_login_count !== &#039;1&#039;) {
+                                    $state.go(&#039;user_dashboard&#039;, {
+                                            &#039;type&#039;: &#039;news_feed&#039;,
+                                             &#039;status&#039;: &#039;news_feed&#039;,
+                                        });
+                            } 
+                             else {
+                                $window.location.href = &#039;users/dashboard&#039;;
+                            }
+                     }, 500);
+                        }
+                    if ($scope.response.error.code === 0 &amp;&amp; $scope.response.thrid_party_profile &amp;&amp; $scope.response.already_register !== &#039;1&#039;) {
+                        $window.localStorage.setItem(&quot;twitter_auth&quot;, JSON.stringify($scope.response));
+                        $state.go(&#039;get_email&#039;);
+                    } else if ($scope.response.access_token) {
+                        $scope.Authuser = {
+                            id: $scope.response.id,
+                            username: $scope.response.username,
+                            role_id: $scope.response.role_id,
+                            refresh_token: $scope.response.refresh_token,
+                        };
+                        $cookies.put(&#039;auth&#039;, JSON.stringify($scope.Authuser), {
+                            path: &#039;/&#039;
+                        });
+                        $cookies.put(&#039;token&#039;, $scope.response.access_token, {
+                            path: &#039;/&#039;
+                        });
+                        $rootScope.user = $scope.response;
+                        $rootScope.$emit(&#039;updateParent&#039;, {
+                            isAuth: true
+                        });
+                        if ($cookies.get(&quot;redirect_url&quot;) !== null &amp;&amp; $cookies.get(&quot;redirect_url&quot;) !== undefined) {
+                            $location.path($cookies.get(&quot;redirect_url&quot;));
+                            $cookies.remove(&#039;redirect_url&#039;);
+                        } else {
+                            $location.path(&#039;/&#039;);
+                        }
+                    }
+                    $uibModalStack.dismissAll();
+                })
+                .catch(function(error) {
+                    console.log(&quot;error in login&quot;, error);
+                });
+        };
+        var params = {};
+        params.fields = &#039;name,icon_class,slug,button_class&#039;;
+        params.is_active = true;
+        providers.get(params, function(response) {
+            $scope.providers = response.data;
+            $rootScope.provider = $scope.providers;
+        });
+    }])
+
+  /*  twitter controller*/
+
+    .controller(&#039;TwitterLoginController&#039;, [&#039;$rootScope&#039;, &#039;$scope&#039;, &#039;twitterLogin&#039;, &#039;providers&#039;, &#039;$auth&#039;, &#039;flash&#039;, &#039;$window&#039;, &#039;$location&#039;, &#039;$state&#039;, &#039;$cookies&#039;, &#039;$filter&#039;, &#039;$timeout&#039;, &#039;ConstUserRole&#039;, &#039;ConstQuoteStatuses&#039;, &#039;myUserFactory&#039;, function($rootScope, $scope, twitterLogin, providers, $auth, flash, $window, $location, $state, $cookies, $filter, $timeout, ConstUserRole, ConstQuoteStatuses, myUserFactory) {
+        $scope.ConstUserRole = ConstUserRole;
+        $scope.ConstQuoteStatuses = ConstQuoteStatuses;
+        $scope.provider_login = $cookies.get(&#039;provider_name&#039;, $scope.social_login_provider);
+        $scope.save_btn = false;
+         myUserFactory.get(function(response) {
+                    $rootScope.my_auth_user = response.data;
+                      });
+        
+        $scope.loginNow = function(form) {
+            if (form) {
+                $scope.user = {};
+                $scope.save_btn = true;
+                $scope.twitterEmail.$setPristine();
+                $scope.twitterEmail.$setUntouched();
+                var params = {};
+                $scope.user = JSON.parse($window.localStorage.getItem(&quot;twitter_auth&quot;));
+                $window.localStorage.removeItem(&quot;twitter_auth&quot;);
+                if ($scope.userChoose === &#039;freelancer&#039;) {
+                    $scope.user.is_freelancer = 1;
+                } else if ($scope.userChoose === &#039;empolyer&#039;) {
+                    $scope.user.is_employer = 1;
+                } else {
+                    $scope.user.is_freelancer = 1;
+                    $scope.user.is_employer = 1;
+                }
+                if ($scope.provider_login === &#039;twitter&#039;) {
+                    $scope.user.email = $scope.user_email;
+                    params.type = &#039;twitter&#039;;
+                }
+                if ($scope.provider_login === &#039;facebook&#039;) {
+                    params.type = &#039;facebook&#039;;
+                }
+                if ($scope.provider_login === &#039;google&#039;) {
+                    params.type = &#039;google&#039;;
+                }
+                twitterLogin.login(params, $scope.user, function(response) {
+                    $scope.response = response;
+                    $scope.save_btn = false;
+                    if ($scope.response.error.code === 0) {
+                        myUserFactory();
+                        if ($scope.provider_login === &#039;facebook&#039; || $scope.provider_login === &#039;google&#039;) {
+                            $scope.Authuser = {
+                                id: $scope.response.id,
+                                username: $scope.response.username,
+                                role_id: $scope.response.role_id,
+                                refresh_token: $scope.response.refresh_token,
+                            };
+                            $cookies.put(&#039;auth&#039;, JSON.stringify($scope.Authuser), {
+                                path: &#039;/&#039;
+                            });
+                            $cookies.put(&#039;token&#039;, $scope.response.access_token, {
+                                path: &#039;/&#039;
+                            });
+                            $rootScope.user = $scope.response;
+                            $rootScope.$emit(&#039;updateParent&#039;, {
+                                isAuth: true
+                            });
+                            flash.set($filter(&quot;translate&quot;)(&quot;You have successfully registered with our site.&quot;), &#039;success&#039;, false);
+                            if ($cookies.get(&quot;redirect_url&quot;) !== null &amp;&amp; $cookies.get(&quot;redirect_url&quot;) !== undefined) {
+                                $location.path($cookies.get(&quot;redirect_url&quot;));
+                                $cookies.remove(&#039;redirect_url&#039;);
+                            } else {
+                                $location.path(&#039;/&#039;);
+                            }
+                            $state.reload();
+                            $timeout(function() {
+                                if ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Portfolio/Portfolio&#039;) &gt; -1 === false &amp;&amp; ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Quote/Quote&#039;) &gt; -1 === true, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Job/Job&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Contest/Contest&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Bidding/Bidding&#039;) &gt; -1 === false)) {
+                                    if ($scope.response.role_id === ConstUserRole.Freelancer) {
+                                        $window.location.href = &#039;my_works&#039;;
+                                    } else if ($scope.response.role_id === ConstUserRole.Employer) {
+                                        $window.location.href = &#039;quote_bids/my_requests/all/&#039; + $scope.ConstQuoteStatuses.UnderDiscussion + &#039;/under_discussion&#039;;
+                                    } else {
+                                        $window.location.href = &#039;users/dashboard&#039;;
+                                    }
+                                }
+                                if (($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Portfolio/Portfolio&#039;) &gt; -1 === false &amp;&amp; $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Quote/Quote&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Job/Job&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Contest/Contest&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Bidding/Bidding&#039;) &gt; -1 === true) &amp;&amp;  $scope.my_auth_user.user_login_count ===&#039;1&#039;) {
+                                 $window.location.href = &#039;users/&#039; + $scope.my_auth_user.id + &#039;/&#039; + $scope.my_auth_user.username;
+                                } else if (($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Portfolio/Portfolio&#039;) &gt; -1 === false &amp;&amp; $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Quote/Quote&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Job/Job&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Contest/Contest&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Bidding/Bidding&#039;) &gt; -1 === true) &amp;&amp;  $scope.my_auth_user.user_login_count !==&#039;1&#039;) {
+                                    $state.go(&#039;user_dashboard&#039;, {
+                                            &#039;type&#039;: &#039;news_feed&#039;,
+                                            &#039;status&#039;: &#039;news_feed&#039;,
+                                        });
+                                } 
+                                else {
+                                    $window.location.href = &#039;users/dashboard&#039;;
+                                }
+                            }, 200);
+                        }
+                        if ($scope.provider_login === &#039;twitter&#039;) {
+                            if (parseInt($rootScope.settings.USER_IS_AUTO_LOGIN_AFTER_REGISTER)) {
+                                $scope.Authuser = {
+                                    id: $scope.response.id,
+                                    username: $scope.response.username,
+                                    role_id: $scope.response.role_id,
+                                    refresh_token: $scope.response.refresh_token,
+                                };
+                                $cookies.put(&#039;auth&#039;, JSON.stringify($scope.Authuser), {
+                                    path: &#039;/&#039;
+                                });
+                                $cookies.put(&#039;token&#039;, $scope.response.access_token, {
+                                    path: &#039;/&#039;
+                                });
+                                $rootScope.user = $scope.response;
+                                $rootScope.$emit(&#039;updateParent&#039;, {
+                                    isAuth: true
+                                });
+                                flash.set($filter(&quot;translate&quot;)(&quot;You have successfully registered with our site.&quot;), &#039;success&#039;, false);
+                                if ($cookies.get(&quot;redirect_url&quot;) !== null &amp;&amp; $cookies.get(&quot;redirect_url&quot;) !== undefined) {
+                                    $location.path($cookies.get(&quot;redirect_url&quot;));
+                                    $cookies.remove(&#039;redirect_url&#039;);
+                                } else {
+                                    $location.path(&#039;/&#039;);
+                                }
+                                $state.reload();
+                                $timeout(function() {
+                                    if ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Portfolio/Portfolio&#039;) &gt; -1 === false &amp;&amp; ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Quote/Quote&#039;) &gt; -1 === true, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Job/Job&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Contest/Contest&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Bidding/Bidding&#039;) &gt; -1 === false)) {
+                                        if ($scope.response.role_id === ConstUserRole.Freelancer) {
+                                            $window.location.href = &#039;my_works&#039;;
+                                        } else if ($scope.response.role_id === ConstUserRole.Employer) {
+                                            $window.location.href = &#039;quote_bids/my_requests/all/&#039; + $scope.ConstQuoteStatuses.UnderDiscussion + &#039;/under_discussion&#039;;
+                                        } else {
+                                            $window.location.href = &#039;users/dashboard&#039;;
+                                        }
+                                    }
+                                    if (($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Portfolio/Portfolio&#039;) &gt; -1 === false &amp;&amp; $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Quote/Quote&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Job/Job&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Contest/Contest&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Bidding/Bidding&#039;) &gt; -1 === true) &amp;&amp; $scope.my_auth_user.user_login_count !==&#039;1&#039;) {
+                                           $state.go(&#039;user_dashboard&#039;, {
+                                                &#039;type&#039;: &#039;news_feed&#039;,
+                                                &#039;status&#039;: &#039;news_feed&#039;,
+                                            });
+                                    } else if (($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Portfolio/Portfolio&#039;) &gt; -1 === false &amp;&amp; $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Quote/Quote&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Job/Job&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Contest/Contest&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Bidding/Bidding&#039;) &gt; -1 === true) &amp;&amp; $scope.my_auth_user.user_login_count ===&#039;1&#039;) {
+                                           $window.location.href = &#039;users/&#039; + $scope.my_auth_user.id + &#039;/&#039; + $scope.my_auth_user.username;
+                                    }  
+                                    else {
+                                        $window.location.href = &#039;users/dashboard&#039;;
+                                    }
+                                }, 200);
+                            } else if (parseInt($rootScope.settings.USER_IS_EMAIL_VERIFICATION_FOR_REGISTER)) {
+                                flash.set($filter(&quot;translate&quot;)(&quot;You have successfully registered with our site and your activation mail has been sent to your mail inbox.&quot;), &#039;success&#039;, false);
+                                $state.go(&#039;home&#039;);
+                            } else if (parseInt($rootScope.settings.USER_IS_ADMIN_ACTIVATE_AFTER_REGISTER)) {
+                                flash.set($filter(&quot;translate&quot;)(&quot;You have successfully registered with our site. After administrator approval you can login to site.&quot;), &#039;success&#039;, false);
+                                $state.go(&#039;home&#039;);
+                            } else if (parseInt($rootScope.settings.USER_IS_EMAIL_VERIFICATION_FOR_REGISTER) &amp;&amp; parseInt($rootScope.settings.USER_IS_ADMIN_ACTIVATE_AFTER_REGISTER)) {
+                                flash.set($filter(&quot;translate&quot;)(&quot;You have successfully registered with our site you can login after email verification and administrator approval. Your activation mail has been sent to your mail inbox.&quot;), &#039;success&#039;, false);
+                                $state.go(&#039;home&#039;);
+                            } else {
+                                $scope.Authuser = {
+                                    id: $scope.response.id,
+                                    username: $scope.response.username,
+                                    role_id: $scope.response.role_id,
+                                    refresh_token: $scope.response.refresh_token,
+                                };
+                                $cookies.put(&#039;auth&#039;, JSON.stringify($scope.Authuser), {
+                                    path: &#039;/&#039;
+                                });
+                                $cookies.put(&#039;token&#039;, $scope.response.access_token, {
+                                    path: &#039;/&#039;
+                                });
+                                $rootScope.user = $scope.response;
+                                $rootScope.$emit(&#039;updateParent&#039;, {
+                                    isAuth: true
+                                });
+                                flash.set($filter(&quot;translate&quot;)(&quot;You have successfully registered with our site.&quot;), &#039;success&#039;, false);
+                                if ($cookies.get(&quot;redirect_url&quot;) !== null &amp;&amp; $cookies.get(&quot;redirect_url&quot;) !== undefined) {
+                                    $location.path($cookies.get(&quot;redirect_url&quot;));
+                                    $cookies.remove(&#039;redirect_url&#039;);
+                                } else {
+                                    $location.path(&#039;/&#039;);
+                                }
+                                $state.reload();
+                                $timeout(function() {
+                                    if ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Portfolio/Portfolio&#039;) &gt; -1 === false &amp;&amp; ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Quote/Quote&#039;) &gt; -1 === true, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Job/Job&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Contest/Contest&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Bidding/Bidding&#039;) &gt; -1 === false)) {
+                                        if ($scope.response.role_id === ConstUserRole.Freelancer) {
+                                            $window.location.href = &#039;my_works&#039;;
+                                        } else if ($scope.response.role_id === ConstUserRole.Employer) {
+                                            $window.location.href = &#039;quote_bids/my_requests/all/&#039; + $scope.ConstQuoteStatuses.UnderDiscussion + &#039;/under_discussion&#039;;
+                                        } else {
+                                            $window.location.href = &#039;users/dashboard&#039;;
+                                        }
+                                    }
+                                    if ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Portfolio/Portfolio&#039;) &gt; -1 === false &amp;&amp; ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Quote/Quote&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Job/Job&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Contest/Contest&#039;) &gt; -1 === false, $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Bidding/Bidding&#039;) &gt; -1 === true)) {
+                                        if ($scope.response.role_id === ConstUserRole.Freelancer) {
+                                            $window.location.href = &#039;users/dashboard?type=projects&amp;status=my_bids&#039;;
+                                        } else if ($scope.response.role_id === ConstUserRole.Employer) {
+                                            $window.location.href = &#039;users/dashboard?type=my_projects&amp;status=open_bidding&#039;;
+                                        } else {
+                                            $window.location.href = &#039;users/dashboard&#039;;
+                                        }
+                                    } else {
+                                        $window.location.href = &#039;users/dashboard&#039;;
+                                    }
+                                }, 200);
+                            }
+                        }
+                    }
+                });
+            }
+        };
+    }]);</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

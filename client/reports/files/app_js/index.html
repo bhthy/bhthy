@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - app.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>app.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">67.73</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">636</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">37.67</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">7.04</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/*globals $:false */
+&#039;use strict&#039;;
+/**
+ * @ngdoc overview
+ * @name getlancerApp
+ * @description
+ * # getlancerApp
+ *
+ * Main module of the application.
+ */
+angular.module(&#039;getlancerApp&#039;, [
+    &#039;getlancerApp.Constant&#039;,
+    &#039;getlancerApp.Common.UserFollow&#039;,
+    &#039;getlancerApp.Common.UserFlag&#039;,
+    &#039;getlancerApp.Common.Subscription&#039;,
+    &#039;ngResource&#039;,
+    &#039;ngSanitize&#039;,
+    &#039;satellizer&#039;,
+    &#039;ngAnimate&#039;,
+    &#039;ui.bootstrap&#039;,
+    &#039;ui.bootstrap.datetimepicker&#039;,
+    &#039;ui.router&#039;,
+    &#039;angular-growl&#039;,
+    &#039;google.places&#039;,
+    &#039;angular.filter&#039;,
+    &#039;ngCookies&#039;,
+    &#039;angular-md5&#039;,
+    &#039;ui.select2&#039;,
+    &#039;ui.select&#039;,
+    &#039;http-auth-interceptor&#039;,
+    &#039;vcRecaptcha&#039;,
+    &#039;angulartics&#039;,
+    &#039;pascalprecht.translate&#039;,
+    &#039;angulartics.google.analytics&#039;,
+    &#039;tmh.dynamicLocale&#039;,
+    &#039;ngMap&#039;,
+    &#039;chieffancypants.loadingBar&#039;,
+    &#039;payment&#039;,
+    &#039;builder&#039;,
+    &#039;builder.components&#039;,
+    &#039;validator.rules&#039;,
+    &#039;angularMoment&#039;,
+    &#039;ngFileUpload&#039;,
+    &#039;oitozero.ngSweetAlert&#039;,
+    &#039;720kb.socialshare&#039;,
+    &#039;slugifier&#039;,
+    &#039;textAngular&#039;
+])
+    .config([&#039;$stateProvider&#039;, &#039;$urlRouterProvider&#039;, &#039;$translateProvider&#039;, function($stateProvider, $urlRouterProvider, $translateProvider) {
+        //$translateProvider.translations(&#039;en&#039;, translations).preferredLanguage(&#039;en&#039;);
+        $translateProvider.useStaticFilesLoader({
+            prefix: &#039;scripts/l10n/&#039;,
+            suffix: &#039;.json&#039;
+        });
+        $translateProvider.preferredLanguage(&#039;en&#039;);
+        $translateProvider.useLocalStorage(); // saves selected language to localStorage
+        // Enable escaping of HTML
+        $translateProvider.useSanitizeValueStrategy(&#039;escape&#039;);
+        //	$translateProvider.useCookieStorage();
+    }])
+    .config(function(tmhDynamicLocaleProvider) {
+        tmhDynamicLocaleProvider.localeLocationPattern(&#039;scripts/l10n/angular-i18n/angular-locale_{{locale}}.js&#039;);
+    })
+    .config([&#039;$authProvider&#039;, function($authProvider) {
+        var params = {};
+        params.fields = &#039;api_key,slug&#039;;
+        $.get(&#039;/api/v1/providers&#039;, params, function(response) {
+            var credentials = {};
+            var url = &#039;&#039;;
+            var providers = response;
+            angular.forEach(providers.data, function(res, i) {
+                //jshint unused:false
+                url = window.location.protocol + &#039;//&#039; + window.location.host + &#039;/api/v1/users/social_login?type=&#039; + res.slug;
+                credentials = {
+                    clientId: res.api_key,
+                    redirectUri: url,
+                    url: url
+                };
+                if (res.slug === &#039;facebook&#039;) {
+                    $authProvider.facebook(credentials);
+                }
+                if (res.slug === &#039;google&#039;) {
+                    $authProvider.google(credentials);
+                }
+                if (res.slug === &#039;twitter&#039;) {
+                    $authProvider.twitter(credentials);
+                }
+            });
+        });
+    }])
+    .config([&#039;$locationProvider&#039;, function($locationProvider) {
+        //$locationProvider.html5Mode(false);
+        //$locationProvider.hashPrefix(&#039;!&#039;);
+        $locationProvider.html5Mode(true);
+    }])
+    .config(function($stateProvider, $urlRouterProvider) {
+        var getToken = {
+            &#039;TokenServiceData&#039;: function(TokenService, $q) {
+                return $q.all({
+                    AuthServiceData: TokenService.promise,
+                    SettingServiceData: TokenService.promiseSettings
+                });
+            }
+        };
+        $urlRouterProvider.otherwise(&#039;/&#039;);
+        $stateProvider.state(&#039;home&#039;, {
+                url: &#039;/&#039;,
+                templateUrl: &#039;views/home.html&#039;,
+                controller: &#039;HomeController&#039;,
+                resolve: getToken
+            })
+            .state(&#039;users_settings&#039;, {
+                url: &#039;/users/settings?type&#039;,
+                templateUrl: &#039;views/users_settings.html&#039;,
+                resolve: getToken,
+            })
+            .state(&#039;users_change_password&#039;, {
+                url: &#039;/users/change_password&#039;,
+                templateUrl: &#039;views/users_change_password.html&#039;,
+                resolve: getToken
+            })
+            .state(&#039;users_login&#039;, {
+                url: &#039;/users/login&#039;,
+                templateUrl: &#039;views/users_login.html&#039;,
+                resolve: getToken
+            })
+            .state(&#039;users_register&#039;, {
+                url: &#039;/users/register&#039;,
+                templateUrl: &#039;views/users_register.html&#039;,
+                resolve: getToken
+            })
+            .state(&#039;users_logout&#039;, {
+                url: &#039;/users/logout&#039;,
+                controller: &#039;UsersLogoutController&#039;,
+                resolve: getToken
+            })
+            .state(&#039;users_forgot_password&#039;, {
+                url: &#039;/users/forgot_password&#039;,
+                templateUrl: &#039;views/users_forgot_password.html&#039;,
+                resolve: getToken
+            })
+            .state(&#039;user_profile&#039;, {
+                url: &#039;/users/:id/:slug&#039;,
+                templateUrl: &#039;views/user_profile.html&#039;,
+                controller: &#039;UserProfileController&#039;,
+                resolve: getToken
+            })
+            .state(&#039;user_profiles&#039;, {
+                url: &#039;/users/:id/:slug/:portfolio&#039;,
+                templateUrl: &#039;views/user_profile.html&#039;,
+                controller: &#039;UserProfileController&#039;,
+                resolve: getToken
+            })
+            .state(&#039;skills&#039;, {
+                url: &#039;/users/skills&#039;,
+                templateUrl: &#039;views/user_profile_skills.html&#039;,
+                resolve: getToken
+            })
+            .state(&#039;hire_me&#039;, {
+                url: &#039;/hire_me&#039;,
+                templateUrl: &#039;views/hire_me.html&#039;,
+                resolve: getToken
+            })
+            .state(&#039;contact&#039;, {
+                url: &#039;/contact&#039;,
+                templateUrl: &#039;views/contact.html&#039;,
+                resolve: getToken
+            })
+            .state(&#039;users_address_add&#039;, {
+                url: &#039;/users/addresses/add&#039;,
+                templateUrl: &#039;views/users_address_add.html&#039;,
+                resolve: getToken
+            })
+            .state(&#039;pages_view&#039;, {
+                url: &#039;/pages/:id/:slug&#039;,
+                templateUrl: &#039;views/pages_view.html&#039;,
+                resolve: getToken
+            })
+            .state(&#039;users_activation&#039;, {
+                url: &#039;/activation/:user_id/:hash&#039;,
+                templateUrl: &#039;views/users_activation.html&#039;,
+                resolve: getToken
+            })
+            .state(&#039;money_transfer_account&#039;, {
+                url: &#039;/users/money_transfer_account&#039;,
+                templateUrl: &#039;views/money_transfer_account.html&#039;,
+                resolve: getToken
+            })
+            .state(&#039;transactions&#039;, {
+                url: &#039;/transactions&#039;,
+                templateUrl: &#039;views/transactions.html&#039;,
+                resolve: getToken
+            })
+            .state(&#039;get_email&#039;, {
+                url: &#039;/users/get_email&#039;,
+                templateUrl: &#039;views/get_email.html&#039;,
+                controller: &#039;TwitterLoginController&#039;,
+                resolve: getToken
+            })
+            .state(&#039;user_dashboard&#039;, {
+                url: &#039;/users/dashboard?type&amp;status&#039;,
+                templateUrl: &#039;views/users_dashboard.html&#039;,
+                resolve: getToken
+            })
+            .state(&#039;newsfeeds&#039;, {
+                url: &#039;/newsfeed&#039;,
+                /*controller: &#039;newsFeedsCtrl&#039;,*/
+                templateUrl: &#039;views/news_feeds.html&#039;,
+                resolve: getToken
+            })
+            .state(&#039;Users&#039;, {
+                url: &#039;/freelancers?q&amp;skills&amp;hourly_rate&amp;page&#039;,
+                templateUrl: &#039;views/users.html&#039;,
+                resolve: getToken
+            })
+            .state(&#039;quote_credit_purchase_plan&#039;, {
+                url: &#039;/purchase_plan?error_code&#039;,
+                templateUrl: &#039;scripts/plugins/Common/Subscription/views/default/quote_credit_purchase_plan.html&#039;,
+                resolve: getToken
+            })
+            .state(&#039;quote_credit_purchase_logs_me&#039;, {
+                url: &#039;/purchase_logs?page&#039;,
+                templateUrl: &#039;scripts/plugins/Common/Subscription/views/default/quote_credit_purchase_logs.html&#039;,
+                resolve: getToken
+            });
+    })
+    .config([&#039;growlProvider&#039;, function(growlProvider) {
+        growlProvider.onlyUniqueMessages(true);
+        growlProvider.globalTimeToLive(5000);
+        growlProvider.globalPosition(&#039;top-center&#039;);
+        growlProvider.globalDisableCountDown(true);
+    }])
+    .run(function($rootScope, $location, $window, $cookies) {
+        $rootScope.$on(&#039;$stateChangeStart&#039;, function(event, toState, toParams, fromState, fromParams) {
+            $rootScope.ShowSearch = true;
+            //jshint unused:false
+            $rootScope.previousState = {};
+            $rootScope.previousState.state_name = toState.name;
+            $rootScope.previousState.params = toParams;
+            var url = toState.name;
+            var exception_array = [&#039;home&#039;, &#039;users_login&#039;, &#039;users_register&#039;, &#039;users_forgot_password&#039;, &#039;pages_view&#039;, &#039;contact&#039;, &#039;jobs&#039;, &#039;jobs_view&#039;, &#039;get_email&#039;, &#039;Users&#039;, &#039;users_activation&#039;, &#039;user_profile&#039;];
+            var quote_exception = [&#039;quote_services&#039;, &#039;quote_service&#039;, &#039;quote_services_category&#039;, &#039;user_services&#039;, &#039;quote_services_filter&#039;, &#039;quote_services_category_view&#039;, &#039;quote_service_filter&#039;];
+            var contest_exception = [&#039;Contest&#039;, &#039;ContestView&#039;];
+            var portfolio_exception = [&#039;portfolios&#039;, &#039;portfolio_view&#039;, &#039;search_portfoliotags&#039;, &#039;Portfolio_Userprofile&#039;];
+            var bidding_exception = [&#039;Bid_Projects&#039;, &#039;Exam&#039;, &#039;ExamView&#039;, &#039;Bid_ProjectView&#039;];
+            var exception_arr = exception_array.concat(bidding_exception, portfolio_exception, exception_array, quote_exception, contest_exception);
+            if (url !== undefined) {
+                if (exception_arr.indexOf(url) === -1 &amp;&amp; ($cookies.get(&quot;auth&quot;) === null || $cookies.get(&quot;auth&quot;) === undefined)) {
+                    $location.path(&#039;/users/login&#039;);
+                }
+            }
+        });
+        $rootScope.$on(&#039;$viewContentLoaded&#039;, function() {
+            $(&#039;div.loader&#039;)
+                .hide();
+            $(&#039;body&#039;)
+                .removeClass(&#039;site-loading&#039;);
+        });
+        $rootScope.$on(&#039;$stateChangeSuccess&#039;, function() {
+            $(&#039;html, body&#039;)
+                .stop(true, true)
+                .animate({
+                    scrollTop: 0
+                }, 600);
+        });
+        var query_string = $location.search()
+            .action;
+        if (query_string !== &#039;&#039;) {
+            $(&#039;html, body&#039;)
+                .stop(true, true)
+                .animate({
+                    scrollTop: 0
+                }, 450);
+        }
+    })
+    .config([&#039;$httpProvider&#039;,
+        function($httpProvider) {
+            $httpProvider.interceptors.push(&#039;interceptor&#039;);
+            $httpProvider.interceptors.push(function() {
+                return {
+                    &#039;request&#039;: function(config) {
+                        if (config.url.indexOf(&#039;api/&#039;) === 1) {
+                            config.url = config.url; //jshint ignore:line
+                        } else if (config.url.indexOf(&#039;views/&#039;) !== -1) {
+                            config.url = theme + config.url; //jshint ignore:line
+                        } else {
+                            config.url = config.url; //jshint ignore:line
+                        }
+                        return config;
+                    }
+                };
+            });
+            $httpProvider.interceptors.push(&#039;oauthTokenInjector&#039;);
+        }
+    ])
+    .config(function(cfpLoadingBarProvider) {
+        // true is the default, but I left this here as an example:
+        cfpLoadingBarProvider.includeSpinner = false;
+    })
+    .directive(&#039;stringToNumber&#039;, function() {
+        return {
+            require: &#039;ngModel&#039;,
+            link: function(scope, element, attrs, ngModel) {
+                ngModel.$parsers.push(function(value) {
+                    return &#039;&#039; + value;
+                });
+                ngModel.$formatters.push(function(value) {
+                    return parseFloat(value);
+                });
+            }
+        };
+    })
+    .factory(&#039;interceptor&#039;, [&#039;$q&#039;, &#039;$location&#039;, &#039;flash&#039;, &#039;$window&#039;, &#039;$timeout&#039;, &#039;$rootScope&#039;, &#039;$filter&#039;, &#039;$cookies&#039;, function($q, $location, flash, $window, $timeout, $rootScope, $filter, $cookies) {
+        return {
+            response: function(response) {
+                $rootScope.isOn404 = false;
+                if (response.status === 200) {
+                    $rootScope.isOn404 = false;
+                    $(&#039;.main_div&#039;)
+                        .css(&#039;display&#039;, &#039;block&#039;);
+                    $(&#039;.js-404-div-open&#039;)
+                        .css(&#039;display&#039;, &#039;none&#039;);
+                }
+              if($rootScope.Freelancer === true)
+                 {
+                if($location.$$url === &quot;/quote_services&quot; || $location.$$url === &quot;/service_category&quot;)
+                    {
+                    $rootScope.isOn404 = true;
+                    $(&#039;.main_div&#039;)
+                        .css(&#039;display&#039;, &#039;none&#039;);
+                    $(&#039;.js-404-div-open&#039;)
+                        .css(&#039;display&#039;, &#039;block&#039;);
+                    }
+                }
+                if (angular.isDefined(response.data)) {
+                    if (angular.isDefined(response.data.thrid_party_login)) {
+                        if (angular.isDefined(response.data.error)) {
+                            if (angular.isDefined(response.data.error.code) &amp;&amp; parseInt(response.data.error.code) === 0) {
+                                $cookies.put(&#039;auth&#039;, JSON.stringify(response.data.user), {
+                                    path: &#039;/&#039;
+                                });
+                                /* $timeout(function() {
+                                     location.reload(true);
+                                 });*/
+                            } else {
+                                var flashMessage;
+                                flashMessage = $filter(&quot;translate&quot;)(&quot;Please choose different E-mail.&quot;);
+                                flash.set(flashMessage, &#039;error&#039;, false);
+                            }
+                        }
+                    }
+                }
+                // Return the response or promise.
+                return response || $q.when(response);
+            },
+            // On response failture
+            responseError: function(response) {
+                $timeout(function() {
+                    if (response.status === 404) {
+                        $rootScope.isOn404 = true;
+                        $(&#039;.main_div&#039;)
+                            .css(&#039;display&#039;, &#039;none&#039;);
+                    }
+                }, 500);
+                $timeout(function() {
+                    if (response.status === 404) {
+                        $rootScope.isOn404 = true;
+                        $(&#039;.js-404-div-open&#039;)
+                            .css(&#039;display&#039;, &#039;block&#039;);
+                    }
+                }, 500);
+                // Return the promise rejection.
+                if (response.status === 401) {
+                    var redirectto = $location.absUrl().split(&#039;/&#039;);    
+                    redirectto = redirectto[0] + &#039;/users/login&#039;;
+                    if ($cookies.get(&quot;auth&quot;) !== null &amp;&amp; $cookies.get(&quot;auth&quot;) !== undefined) {
+                        var auth = JSON.parse($cookies.get(&quot;auth&quot;));
+                        var refresh_token = auth.refresh_token;
+                        if (refresh_token === null || refresh_token === &#039;&#039; || refresh_token === undefined) {
+                            $cookies.remove(&#039;auth&#039;, {
+                                path: &#039;/&#039;
+                            });
+                            $cookies.remove(&#039;token&#039;, {
+                                path: &#039;/&#039;
+                            });
+                            $rootScope.refresh_token_loading = false;
+                            window.location.href = redirectto;
+                        } else {
+                            if ($rootScope.refresh_token_loading !== true) {
+                                $rootScope.$broadcast(&#039;useRefreshToken&#039;);
+                            }
+                        }
+                    } else {
+                       $cookies.remove(&#039;auth&#039;, {
+                                path: &#039;/&#039;
+                            });
+                        $cookies.remove(&#039;token&#039;, {
+                            path: &#039;/&#039;
+                        });
+                        $rootScope.refresh_token_loading = false;
+                        window.location.href = redirectto; 
+                    }
+                }
+                return $q.reject(response);
+            }
+        };
+    }])
+    .filter(&#039;unsafe&#039;, function($sce) {
+        return function(val) {
+            return $sce.trustAsHtml(val);
+        };
+    })
+    .filter(&#039;split&#039;, function() {
+        return function(input, splitChar) {
+            var _input = input.split(splitChar);
+            _input.pop();
+            return _input.join(&#039;:&#039;);
+        };
+    })
+    .filter(&#039;spaceless&#039;, function() {
+        return function(input) {
+            if (input) {
+                return input.replace(/\s+/g, &#039;-&#039;);
+            }
+        };
+    })
+    .filter(&#039;customCurrency&#039;, function($rootScope, $filter) {
+        var currency_symbol = $rootScope.settings.CURRENCY_SYMBOL;
+        return function(input, symbol, fractionSize) {
+            if (isNaN(input)) {
+                input = symbol + $filter(&#039;number&#039;)(input, fractionSize || 2);
+                return input;
+            } else if (currency_symbol) {
+                var symbol = symbol || $rootScope.settings.CURRENCY_SYMBOL; //jshint ignore:line
+                input = symbol + $filter(&#039;number&#039;)(input, fractionSize || 2); //jshint ignore:line
+                return input;
+            } else {
+                var symbol = symbol || $rootScope.settings.CURRENCY_CODE; //jshint ignore:line
+                input = symbol + $filter(&#039;number&#039;)(input, fractionSize || 2); //jshint ignore:line
+                return input;
+            }
+        };
+    }) //jshint ignore:line
+    .filter(&#039;nl2br&#039;, function() {
+        var span = document.createElement(&#039;span&#039;);
+        return function(input) {
+            if (!input) {
+                return input;
+            }
+            var lines = input.split(&#039;\n&#039;);
+            for (var i = 0; i &lt; lines.length; i++) {
+                span.innerText = lines[i];
+                span.textContent = lines[i]; //for Firefox
+                lines[i] = span.innerHTML;
+            }
+            return lines.join(&#039;&lt;br /&gt;&#039;);
+        };
+    })
+    .filter(&#039;cut&#039;, function() {
+        return function(value, wordwise, max, tail) {
+            if (!value) {
+                return &#039;&#039;;
+            }
+            max = parseInt(max, 10);
+            if (!max) {
+                return value;
+            }
+            if (value.length &lt;= max) {
+                return value;
+            }
+            value = value.substr(0, max);
+            if (wordwise) {
+                var lastspace = value.lastIndexOf(&#039; &#039;);
+                if (lastspace !== -1) {
+                    //Also remove . and , so its gives a cleaner result.
+                    if (value.charAt(lastspace - 1) === &#039;.&#039; || value.charAt(lastspace - 1) === &#039;,&#039;) {
+                        lastspace = lastspace - 1;
+                    }
+                    value = value.substr(0, lastspace);
+                }
+            }
+            return value + (tail || &#039; …&#039;);
+        };
+    })
+    .filter(&#039;reverse&#039;, function() {
+        return function(items) {
+            return items.slice()
+                .reverse();
+        };
+    })
+    .filter(&#039;date_format&#039;, function($filter) {
+        return function(input, format) {
+            return $filter(&#039;date&#039;)(new Date(input), format);
+        };
+    })
+    /** time ago filter using jquery timeago plugin **/
+    .filter(&quot;timeago&quot;, [&#039;$rootScope&#039;, function($rootScope) {
+        var timeZone = ($rootScope.settings.SITE_TIMEZONE) ? $rootScope.settings.SITE_TIMEZONE : &#039;+0000&#039;;
+        return function(date) {
+            jQuery.timeago.settings.strings = {//jshint ignore:line
+                prefixAgo: null,
+                prefixFromNow: null,
+                suffixAgo: &quot;ago&quot;,
+                suffixFromNow: &quot;from now&quot;,
+                seconds: &quot;less than a minute&quot;,
+                minute: &quot;a minute&quot;,
+                minutes: &quot;%d minutes&quot;,
+                hour: &quot;an hour&quot;,
+                hours: &quot;%d hours&quot;,
+                day: &quot;a day&quot;,
+                days: &quot;%d days&quot;,
+                month: &quot;a month&quot;,
+                months: &quot;%d months&quot;,
+                year: &quot;a year&quot;,
+                years: &quot;%d years&quot;,
+                wordSeparator: &quot; &quot;,
+                numbers: []
+            };
+            return jQuery.timeago(date + timeZone);//jshint ignore:line
+        };
+    }])
+     /**
+   * @ngdoc filter
+   * @name getlancerApp.capitalize
+   * @param {string} value
+   * @description
+   * For change the first character upper case in give string.
+   */
+  .filter(&#039;capitalize&#039;, function () {
+    return function (input) {
+      return (!!input) ? input.charAt(0)
+        .toUpperCase() + input.substr(1)
+        .toLowerCase() : &#039;&#039;;
+    };
+  })
+    /* jshint latedef:nofunc */
+    /*global*/
+    /**
+   * @ngdoc directive
+   * @name getlancerApp.Job.inputStars
+   * @param {object} value
+   * @description
+   * For using the star rating.  
+   */
+  .directive(&#039;inputStars&#039;, [function () {
+    var directive = {
+      restrict: &#039;EA&#039;,
+      replace: true,
+      template: &#039;&lt;ul class=&quot;listClass list-ratings&quot;&gt;&#039; + &#039;&lt;li ng-touch=&quot;paintStars($index)&quot; ng-mouseenter=&quot;paintStars($index, true)&quot; ng-mouseleave=&quot;unpaintStars($index, false)&quot; ng-repeat=&quot;item in items track by $index&quot;&gt;&#039; + &#039;&lt;i  ng-class=&quot;getClass($index)&quot; ng-click=&quot;setValue($index, $event)&quot;&gt;&lt;/i&gt;&#039; + &#039;&lt;/li&gt;&#039; + &#039;&lt;/ul&gt;&#039;,
+      require: &#039;ngModel&#039;,
+      scope: true,
+      link: link
+    };
+     function link(scope, element, attrs, ngModelCtrl) {
+      var computed = {
+        get readonly() {
+          return attrs.readonly !== &#039;false&#039; &amp;&amp; (attrs.readonly || attrs.readonly === &#039;&#039;);
+        },
+        get fullIcon() {
+          return attrs.iconFull || &#039;fa-star&#039;;
+        },
+        get emptyIcon() {
+          return attrs.iconEmpty || &#039;fa-star-o&#039;;
+        },
+        get iconBase() {
+          return attrs.iconBase || &#039;fa fa-fw&#039;;
+        },
+        get iconHover() {
+          return attrs.iconHover || &#039;angular-input-stars-hover&#039;;
+        }
+      };
+      scope.items = new Array(+attrs.max);
+      scope.listClass = attrs.listClass || &#039;angular-input-stars&#039;;
+      ngModelCtrl.$render = function () {
+        scope.lastValue = ngModelCtrl.$viewValue || 0;
+      };
+      scope.getClass = function (index) {
+        var icon = index &gt;= scope.lastValue ? computed.iconBase + &#039; &#039; + computed.emptyIcon : computed.iconBase + &#039; &#039; + computed.fullIcon + &#039; active &#039;;
+        return computed.readonly ? icon + &#039; readonly&#039; : icon;
+      };
+      scope.unpaintStars = function ($index, hover) {
+        scope.paintStars(scope.lastValue - 1, hover);
+      };
+      scope.paintStars = function ($index, hover) {
+        // ignore painting if readonly
+        if (computed.readonly) {
+          return;
+        }
+        var items = element.find(&#039;li&#039;)
+          .find(&#039;i&#039;);
+        for (var index = 0; index &lt; items.length; index++) {
+          var $star = angular.element(items[index]);
+          if ($index &gt;= index) {
+            $star.removeClass(computed.emptyIcon);
+            $star.addClass(computed.fullIcon);
+            $star.addClass(&#039;active&#039;);
+            $star.addClass(computed.iconHover);
+          } else {
+            $star.removeClass(computed.fullIcon);
+            $star.removeClass(&#039;active&#039;);
+            $star.removeClass(computed.iconHover);
+            $star.addClass(computed.emptyIcon);
+          }
+        }
+        if (!hover) {
+          items.removeClass(computed.iconHover);
+        }
+      };
+      scope.setValue = function (index, e) {
+        // ignore setting value if readonly
+        if (computed.readonly) {
+          return;
+        }
+        var star = e.target,
+          newValue;
+        if (e.pageX &lt; star.getBoundingClientRect()
+          .left + star.offsetWidth / 2) {
+          newValue = index + 1;
+        } else {
+          newValue = index + 1;
+        }
+        // sets to 0 if the user clicks twice on the first &quot;star&quot;
+        // the user should be allowed to give a 0 score
+        if (newValue === scope.lastValue &amp;&amp; newValue === 1) {
+          newValue = 0;
+        }
+        scope.lastValue = newValue;
+        ngModelCtrl.$setViewValue(newValue);
+        ngModelCtrl.$render();
+        //Execute custom trigger function if there is one
+        if (attrs.onStarClick) {
+          scope.$eval(attrs.onStarClick);
+        }
+      };
+    }
+    return directive;   
+  }]);</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

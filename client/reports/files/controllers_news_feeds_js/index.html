@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - controllers/news_feeds.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>controllers/news_feeds.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">67.09</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">364</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">52.23</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">4.55</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">&#039;use strict&#039;;
+/**
+ * @ngdoc directive
+ * @name getlancerApp.directive:Newsfeeds
+ * @description
+ * # Newsfeeds
+ */
+angular.module(&#039;getlancerApp&#039;)
+	.controller(&#039;newsFeedsCtrl&#039;, function($rootScope, NewsFeedsFactory, md5, $window, ActivityType, $scope, $state, ConstUserRole, QuoteStatus, MilestoneStatus, MeNewsFeedsFactory, ProjectStatusConstant, ConstQuoteStatuses, UserProfile, $location, ExamsUsers, ConstExamStatus, ProjectStatuses, MilestoneStatusConstant, MilestoneStatues, SweetAlert, $filter, flash, $timeout, UpdateProjectStatues, UpdateBidsStatus, ConstJobStatus, ConstWithdrawStatus) {
+		$scope.enabled = true;
+		$scope.ConstExamStatus = ConstExamStatus;
+		$scope.lastpage = 1;
+		$scope.currentpage = 1;
+		$scope.news_feeds =[];
+		$scope.ActivityType = ActivityType;
+		$scope.ConstUserRole = ConstUserRole;
+		$scope.QuoteStatus = QuoteStatus;
+		$scope.ProjectStatusConstant = ProjectStatusConstant;
+		$scope.ProjectStatus = ProjectStatuses;
+		$scope.MilestoneStatus = MilestoneStatus;
+		$scope.ConstQuoteStatuses = ConstQuoteStatuses;
+		$scope.MilestoneStatusConstant = MilestoneStatusConstant;
+		$scope.ConstJobStatus =  ConstJobStatus;
+		$scope.ConstWithdrawStatus = ConstWithdrawStatus;
+		$scope.getActivity = false;
+		var params = {}; 
+		$scope.getNewsfeeds = function (type) {
+			$scope.viewall = true;
+			/*$scope.news_feeds = [];*/
+			params.page = $scope.currentpage;
+			$scope.loader = true;
+			$scope.scroll_flag = true;
+			if($location.$$url === &#039;/newsfeed&#039; || $location.$$url === &#039;/users/dashboard?type=news_feed&amp;status=news_feed&#039; || $location.$$url === &#039;/users/dashboard?type=news_feed&#039;)
+			 {
+				 $scope.getActivity = true;
+			 }
+			 /*&amp;&amp; $scope.getActivity === true*/
+			if($rootScope.isAuth &amp;&amp; $scope.getActivity === true)
+			{
+		if($rootScope.user.role_id === ConstUserRole.Admin)
+			{
+				MeNewsFeedsFactory.get(params, function(response) {
+				if (angular.isDefined(response._metadata)) {
+                    $scope.lastpage = response._metadata.last_page;
+                    $scope.currentpage = response._metadata.current_page;
+                }
+				if (angular.isDefined(response.data)) {
+					if (angular.isDefined(response._metadata)) {
+						$scope.totalItems = response._metadata.total;
+						$scope.itemsPerPage = response._metadata.per_page;
+						$scope.noOfPages = response._metadata.last_page;
+					}
+						if(parseInt(response.data.length) === 0 &amp;&amp; $scope.currentpage === 1)
+						{
+							$scope.NorecordFound = true;
+						}else{
+								$scope.NorecordFound = false;
+								$scope.viewall = false;
+						}
+					if(type === &quot;update&quot;)
+					{
+					 $scope.news_feeds = [];
+					 $scope.news_feeds_value = response.data;
+					 $scope.news_feeds.push($scope.news_feeds_value);
+					}else{
+					 $scope.news_feeds_value = response.data;
+					 $scope.news_feeds.push($scope.news_feeds_value);
+
+					}
+
+					$scope.Projectstatus = [];
+					$scope.Projectstatus.push(&#039;ProjectStatus&#039;);
+
+					angular.forEach($scope.ProjectStatus, function(value , key) {
+						$scope.Projectstatus.push(key);
+					});
+					
+					$scope.JobStatus = [];
+					$scope.JobStatus.push(&#039;JobStatus&#039;);
+
+					angular.forEach($scope.ConstJobStatus, function(value , key) {
+						$scope.JobStatus.push(key);
+					});
+					
+					$scope.withdrawStatus = [];
+					$scope.withdrawStatus.push(&#039;pending&#039;);
+
+					angular.forEach($scope.ConstWithdrawStatus, function(value , key) {
+						$scope.withdrawStatus.push(key);
+					});
+
+					 angular.forEach($scope.news_feeds, function(news_feed) {
+						 angular.forEach(news_feed, function(news_feed) {
+								news_feed.formStatus = $scope.Projectstatus[news_feed.from_status_id];
+								news_feed.ToStatus = $scope.Projectstatus[news_feed.to_status_id];
+								news_feed.JobformStatus = $scope.JobStatus[news_feed.from_status_id];
+								news_feed.jobToStatus = $scope.JobStatus[news_feed.to_status_id];
+								news_feed.withdrawStatus = $scope.withdrawStatus[news_feed.to_status_id];
+							if (news_feed.foreign !== null &amp;&amp; news_feed.class === &quot;Portfolio&quot;) {
+								news_feed.portfolio_url = &#039;images/medium_thumb/Portfolio/&#039; + news_feed.foreign.activity.id + &#039;.&#039; + md5.createHash(&#039;Portfolio&#039; + news_feed.foreign.activity.id + &#039;png&#039; + &#039;medium_thumb&#039;) + &#039;.png&#039;;
+							} else {
+								news_feed.portfolio_url = &#039;images/no-image.png&#039;;
+							}
+
+						});	
+					 });
+					 $scope.loader = false;
+				}		
+			}, function() {
+                $scope.scroll_flag = true;
+            });
+			}else{
+				MeNewsFeedsFactory.get(params, function(response) {
+				if (angular.isDefined(response.data)) {
+				if (angular.isDefined(response._metadata)) {
+                    $scope.lastpage = response._metadata.last_page;
+                    $scope.currentpage = response._metadata.current_page;
+                   }
+						if(parseInt(response.data.length) === 0 &amp;&amp; $scope.currentpage === 1)
+						{
+							$scope.NorecordFound = true;
+						}else{
+								$scope.NorecordFound = false;
+								$scope.viewall = false;
+						}
+				   	if(type === &quot;update&quot;)
+					{
+					 $scope.news_feeds = [];
+					 $scope.news_feeds_value = response.data;
+					 $scope.news_feeds.push($scope.news_feeds_value);
+					}else{
+					 $scope.news_feeds_value = response.data;
+					 $scope.news_feeds.push($scope.news_feeds_value);
+					}
+
+					$scope.Projectstatus = [];
+					$scope.Projectstatus.push(&#039;ProjectStatus&#039;);
+
+					$scope.withdrawStatus = [];
+					$scope.withdrawStatus.push(&#039;withdraw&#039;);
+						
+					angular.forEach($scope.ConstWithdrawStatus, function(value , key) {
+							$scope.withdrawStatus.push(key);
+						});
+
+					angular.forEach($scope.ProjectStatus, function(value , key) {
+						$scope.Projectstatus.push(key);
+					});
+
+				angular.forEach($scope.news_feeds, function(news_feed) {
+					 angular.forEach(news_feed, function(news_feed) {
+						news_feed.formStatus = $scope.Projectstatus[news_feed.from_status_id];
+            			news_feed.ToStatus = $scope.Projectstatus[news_feed.to_status_id];
+						news_feed.withdrawStatus = $scope.withdrawStatus[news_feed.to_status_id];
+						if (news_feed.foreign !== null &amp;&amp; news_feed.class === &quot;Portfolio&quot;) {
+							news_feed.portfolio_url = &#039;images/medium_thumb/Portfolio/&#039; + news_feed.foreign.activity.id + &#039;.&#039; + md5.createHash(&#039;Portfolio&#039; + news_feed.foreign.activity.id + &#039;png&#039; + &#039;medium_thumb&#039;) + &#039;.png&#039;;
+						} else {
+							news_feed.portfolio_url = &#039;images/no-image.png&#039;;
+						}
+					   });
+					  });
+					 $scope.loader = false;
+				}
+				}, function() {
+					$scope.scroll_flag = true;
+				});
+			}
+			}
+		};
+
+		function userprofileDetail() {
+            UserProfile.getbyId({
+                id: $rootScope.user.id
+            }, params, function(response) {
+				 if (parseInt(response.error.code) === 0) {
+					 $scope.userprofile = response.data;
+				     }
+				  });
+		    }
+				  userprofileDetail();
+
+
+		$scope.GetExamCeritifications = function() {
+            var params = {};
+            params.user_id = $rootScope.user.id;
+            params.exam_status_id = $scope.ConstExamStatus.Passed;
+            ExamsUsers.getall(params, function(response) {
+                $scope.examCertifications = response.data;
+                angular.forEach($scope.examCertifications, function(value) {
+                    $scope.total_mark = Number(value.total_mark || 0);
+                    $scope.total_question_count = Number(value.total_question_count || 0);
+                    $scope.average = $scope.total_mark / $scope.total_question_count;
+                    value.exam_user_per = parseInt($scope.average * 100);
+                    if (angular.isDefined(value.exam.attachment) &amp;&amp; value.exam.attachment !== null) {
+                        value.logo_url = &#039;images/small_normal_thumb/&#039; + value.exam.attachment.class + &#039;/&#039; + value.exam.attachment.foreign_id + &#039;.&#039; + md5.createHash(value.exam.attachment.class + value.exam.attachment.foreign_id + &#039;png&#039; + &#039;small_normal_thumb&#039;) + &#039;.png&#039;;
+                    } else {
+                        value.logo_url = &#039;images/no-image.png&#039;;
+                    }
+                });
+            });
+        };
+		$timeout(function() {
+		if($rootScope.isAuth){
+			if ($rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Bidding/Exam&#039;) &gt; -1 === true) {
+					$scope.GetExamCeritifications();}
+		   }
+		}, 1000);
+	/*	unreadedActivity function */
+	var userparams ={};
+		$scope.unreadedActivity = function()
+		{
+		$scope.getActivity = true;
+		 userparams.is_have_unreaded_activity  = 0;
+			UserProfile.update({id: $rootScope.user.id,
+				}, userparams, function() {
+					$scope.is_have_unreaded_activity = false;
+			 });
+			 $scope.getNewsfeeds(&#039;update&#039;);
+		};
+		$scope.viewAll = function()
+		{
+		  if($location.$$url === &#039;/users/dashboard?type=news_feed&amp;status=news_feed&#039; || $location.$$url === &#039;/users/dashboard?type=news_feed&#039;)
+			 {
+				 $state.reload();
+			 }
+		};
+		if($location.$$url === &#039;/newsfeed&#039;)
+		{
+			userparams.is_have_unreaded_activity  = 0;
+			UserProfile.update({id: $rootScope.user.id,
+				}, userparams, function() {
+					$scope.is_have_unreaded_activity = false;
+			 });
+		}
+		/*	 user profile get function*/
+		$scope.UserProfile = function(){
+		  UserProfile.getbyId({
+                id: $rootScope.user.id,
+            }, params, function(response) {
+				if (angular.isDefined(response)) {
+				$scope.is_have_unreaded_activity = response.data.is_have_unreaded_activity;
+					$timeout(function() {
+							$scope.UserProfile();
+					}, 60000);
+				}
+			});
+		};
+		$scope.UserProfile();
+		/*	milestone satatus change function */
+			 $scope.milestoneStatueChange = function(milestoneId) {
+                        SweetAlert.swal({
+                            title: $filter(&quot;translate&quot;)(&#039;Are you sure you want to do this action?&#039;),
+                            text: &quot;&quot;,
+                            type: &quot;warning&quot;,
+                            showCancelButton: true,
+                            confirmButtonColor: &quot;#DD6B55&quot;,
+                            confirmButtonText: &quot;OK&quot;,
+                            cancelButtonText: &quot;Cancel&quot;,
+                            closeOnConfirm: true,
+                            animation:false,
+                        }, function(isConfirm) {
+                            if (isConfirm &amp;&amp; $rootScope.settings.SITE_ENABLED_PLUGINS.indexOf(&#039;Bidding/Milestone&#039;) &gt; -1) {
+                                MilestoneStatues.put({id: milestoneId,milestone_status_id: $scope.MilestoneStatusConstant.EscrowReleased}, function(response) {
+									var flashMessage = &quot;&quot;;
+                                     if (response.error.code === 0) { 
+										if (parseInt(response.error.code) === 0) {
+											flashMessage = $filter(&quot;translate&quot;)(&quot;Milestone status changed&quot;);
+											flash.set(flashMessage, &#039;success&#039;, false);
+											 $state.reload();
+										} else {
+											flashMessage = $filter(&quot;translate&quot;)(response.error.message);
+											flash.set(flashMessage, &#039;error&#039;, false);
+										}
+								} else {
+									flashMessage = $filter(&quot;translate&quot;)(response.error.message);
+											flash.set(flashMessage, &#039;error&#039;, false);
+								}
+                            });
+                     } else {
+                        /* Go to the payment page */
+                        $state.go(&#039;newsfeeds&#039;);
+                    }
+                });
+			 };
+			/* awardedprocess function*/
+			    $scope.awardedprocess = function (ftype, projectid, bidid) {
+                    var alertTitle = &quot;&quot;;
+                    if (parseInt(ftype) === 1) {
+                        alertTitle = $filter(&quot;translate&quot;)(&quot;Are you sure you want to accept this project?&quot;);
+                    } else if (parseInt(ftype) === 2) {
+                        alertTitle = $filter(&quot;translate&quot;)(&quot;Are you sure you want to reject this project?&quot;);
+                    }
+                    SweetAlert.swal({
+                        title: alertTitle,
+                        text: &quot;&quot;,
+                        type: &quot;warning&quot;,
+                        showCancelButton: true,
+                        confirmButtonColor: &quot;#DD6B55&quot;,
+                        confirmButtonText: &quot;OK&quot;,
+                        cancelButtonText: &quot;Cancel&quot;,
+                        closeOnConfirm: true,
+                        animation: false,
+                    }, function (isConfirm) {
+                        if (isConfirm) {
+                            var flashMessage = &quot;&quot;;
+                            if (parseInt(ftype) === 1) {
+                               UpdateProjectStatues.put({
+                                    id: projectid,
+                                    project_status_id: $scope.ProjectStatusConstant.UnderDevelopment
+                                }, function (response) {
+                                    if (parseInt(response.error.code) === 0) {
+                                        flashMessage = $filter(&quot;translate&quot;)(&#039;Project successfully accepted and moved under developement status.&#039;);
+                                        flash.set(flashMessage, &#039;success&#039;, false);
+                                        $state.reload();
+                                    } else {
+                                        flashMessage = $filter(&quot;translate&quot;)(&quot;Check your wallet&quot;);
+                                        flash.set(flashMessage, &#039;error&#039;, false);
+                                    }
+                                }, function (error) {
+                                    console.log(error);
+                                });
+                            } else {
+                                var params = {};
+                                params.id = bidid;
+                                UpdateBidsStatus.put(params, { is_offered_rejected: 1 }, function (response) {
+                                    if (parseInt(response.error.code) === 0) {
+                                        flashMessage = $filter(&quot;translate&quot;)(&quot;You are successfully ignore this project request.&quot;);
+                                        flash.set(flashMessage, &#039;success&#039;, false);
+                                        $state.reload();
+                                    } else {
+                                        flashMessage = $filter(&quot;translate&quot;)(&quot;Project couldn&#039;t rejected. Please try again.&quot;);
+                                        flash.set(flashMessage, &#039;error&#039;, false);
+                                    }
+                                }, function (error) {
+                                    console.log(&#039;BiddingAwardDirective&#039;, error);
+                                });
+                            }
+                        }
+                    });
+                };
+	//pagination Function
+        $scope.firstVisit = 0;
+		$scope.page = $scope.currentpage;
+		 $scope.pagination = function() {
+			 $scope.scrolloder = true;
+			 $timeout(function() {
+				$scope.scrolloder = false;
+				if ($scope.enabled === true &amp;&amp; $scope.scroll_flag === true) {
+					if ($scope.currentpage &lt;= $scope.lastpage) {
+						if ($scope.firstVisit !== 0) {
+							$scope.currentpage += 1;
+							$scope.scroll_flag = false;
+									$scope.getNewsfeeds();								
+						}
+						$scope.firstVisit = 1;
+					} else {
+						$scope.enabled = false;
+					}
+				}
+				}, 2000);
+			};
+		 $scope.getNewsfeeds();
+       
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - controllers/users_register.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>controllers/users_register.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">59.72</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">173</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">28.46</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.17</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">&#039;use strict&#039;;
+/**
+ * @ngdoc function
+ * @name getlancerApp.controller:UsersRegisterController
+ * @description
+ * # UsersRegisterController
+ * Controller of the getlancerApp
+ */
+angular.module(&#039;getlancerApp&#039;)
+    .controller(&#039;UsersRegisterController&#039;, [&#039;$rootScope&#039;, &#039;$scope&#039;, &#039;usersRegister&#039;, &#039;flash&#039;, &#039;$location&#039;, &#039;$timeout&#039;, &#039;vcRecaptchaService&#039;, &#039;$filter&#039;, &#039;$cookies&#039;, &#039;$uibModalStack&#039;, &#039;providers&#039;, &#039;$auth&#039;, &#039;$window&#039;, &#039;$state&#039;, function($rootScope, $scope, usersRegister, flash, $location, $timeout, vcRecaptchaService, $filter, $cookies, $uibModalStack, providers, $auth, $window, $state) {
+        // $rootScope.header = $rootScope.settings.SITE_NAME + &#039; | &#039; + $filter(&quot;translate&quot;)(&quot;Register&quot;);
+        var current_state = $state.current.name;
+                if (current_state === &#039;register&#039;) {
+                    $rootScope.header = $rootScope.settings.SITE_NAME + &#039; | &#039; + $filter(&quot;translate&quot;)(&quot;Register&quot;);
+                }
+        /*jshint -W117 */
+        // function validatePassword() {
+        //     var pass2 = document.getElementById(&quot;password&quot;)
+        //         .value;
+        //     var pass1 = document.getElementById(&quot;confirm-password&quot;)
+        //         .value;
+        //     if (pass2 !== null &amp;&amp; pass1 !== null &amp;&amp; pass1 !== pass2) {
+        //         document.getElementById(&quot;confirm-password&quot;)
+        //             .setCustomValidity(&quot;Password Mismatch&quot;);
+        //     } else {
+        //         document.getElementById(&quot;confirm-password&quot;)
+        //             .setCustomValidity(&quot;&quot;);
+        //     }
+        // }
+        // $(document)
+        //     .on(&#039;blur change&#039;, &quot;#password, #confirm-password&quot;, function() {
+        //         validatePassword();
+        //     });
+        $(document)
+            .ready(function() {
+                if (document.getElementById(&quot;is_agree_terms_conditions&quot;)
+                    .checked === false) {
+                    document.getElementById(&quot;is_agree_terms_conditions&quot;)
+                        .setCustomValidity(&quot;You must agree to the terms and conditions&quot;);
+                } else {
+                    document.getElementById(&quot;is_agree_terms_conditions&quot;)
+                        .setCustomValidity(&quot;&quot;);
+                }
+            });
+        var params = {};
+        params.fields = &#039;name,icon_class,slug,button_class&#039;;
+        params.is_active = true;
+        providers.get(params, function(response) {
+            $scope.providers = response.data;
+        });
+        $scope.save_btn = false;
+        $scope.save = function() {
+            if ($rootScope.settings.CAPTCHA_TYPE === &#039;Google reCAPTCHA&#039;) {
+                var response = vcRecaptchaService.getResponse($scope.widgetId);
+                if (response.length === 0) {
+                    $scope.captchaErr = $filter(&quot;translate&quot;)(&quot;Please resolve the captcha and submit&quot;);
+                } else {
+                    $scope.captchaErr = &#039;&#039;;
+                }
+            }
+            if ($rootScope.settings.CAPTCHA_TYPE === &#039;Normal&#039;) {
+                if ($rootScope.captchaFailed === false) {
+                    $scope.userSignup.$valid = false;
+                }
+            }
+            if ($scope.userSignup.$valid &amp;&amp; !$scope.save_btn) {
+                $scope.save_btn = true;
+                if ($scope.userChoose === &#039;freelancer&#039;) {
+                    $scope.user.is_freelancer = 1;
+                } else if ($scope.userChoose === &#039;empolyer&#039;) {
+                    $scope.user.is_employer = 1;
+                } else {
+                    $scope.user.is_freelancer = 1;
+                    $scope.user.is_employer = 1;
+                }
+                if ($scope.userSignup.$valid) {
+                    $scope.userSignup.$setPristine();
+                    $scope.userSignup.$setUntouched();
+                    usersRegister.create($scope.user, function(response) {
+                        $scope.response = response;
+                        delete $scope.response.scope;
+                        if ($scope.response.error.code === 0) {
+                            $scope.redirect = false;
+                            if (parseInt($rootScope.settings.USER_IS_AUTO_LOGIN_AFTER_REGISTER)) {
+                                $scope.redirect = true;
+                                $cookies.put(&#039;auth&#039;, JSON.stringify($scope.response), {
+                                    path: &#039;/&#039;
+                                });
+                                $cookies.put(&#039;token&#039;, $scope.response.access_token, {
+                                    path: &#039;/&#039;
+                                });
+                                $rootScope.$broadcast(&#039;updateParent&#039;, {
+                                    isAuth: true,
+                                    auth: $scope.response
+                                });
+                                flash.set($filter(&quot;translate&quot;)(&quot;You have successfully registered with our site.&quot;), &#039;success&#039;, false);
+                            } else if (parseInt($rootScope.settings.USER_IS_EMAIL_VERIFICATION_FOR_REGISTER) &amp;&amp; parseInt($rootScope.settings.USER_IS_ADMIN_ACTIVATE_AFTER_REGISTER)) {
+                                flash.set($filter(&quot;translate&quot;)(&quot;You have successfully registered with our site you can login after email verification and administrator approval. Your activation mail has been sent to your mail inbox.&quot;), &#039;success&#039;, false);
+                            } else if (parseInt($rootScope.settings.USER_IS_ADMIN_ACTIVATE_AFTER_REGISTER)) {
+                                flash.set($filter(&quot;translate&quot;)(&quot;You have successfully registered with our site. After administrator approval you can login to site.&quot;), &#039;success&#039;, false);
+                            } else if (parseInt($rootScope.settings.USER_IS_EMAIL_VERIFICATION_FOR_REGISTER)) {
+                                flash.set($filter(&quot;translate&quot;)(&quot;You have successfully registered with our site and your activation mail has been sent to your mail inbox.&quot;), &#039;success&#039;, false);
+                            } else {
+                                flash.set($filter(&quot;translate&quot;)(&quot;You have successfully registered with our site.&quot;), &#039;success&#039;, false);
+                            }
+                            if ($cookies.get(&quot;redirect_url&quot;) !== null &amp;&amp; $cookies.get(&quot;redirect_url&quot;) !== undefined &amp;&amp; $scope.redirect) {
+                                $location.path($cookies.get(&quot;redirect_url&quot;));
+                                $cookies.remove(&#039;redirect_url&#039;);
+                            } else {
+                                $uibModalStack.dismissAll();
+                                $timeout(function() {
+                                    $location.path(&#039;/&#039;);
+                                }, 1000);
+                            }
+                        } else {
+                            if (angular.isDefined($scope.response.error.fields) &amp;&amp; angular.isDefined($scope.response.error.fields.unique) &amp;&amp; $scope.response.error.fields.unique.length !== 0) {
+                                flash.set($filter(&quot;translate&quot;)(&quot;Please choose different &quot; + $scope.response.error.fields.unique.join()), &#039;error&#039;, false);
+                                $scope.save_btn = false;
+                            } else {
+                                flash.set($filter(&quot;translate&quot;)(&quot;User could not be added. Please, try again&quot;), &#039;error&#039;, false);
+                                $scope.save_btn = false;
+                            }
+                            if ($rootScope.settings.CAPTCHA_TYPE === &#039;Google reCAPTCHA&#039;) {
+                                vcRecaptchaService.reload($scope.widgetId);
+                            }
+                        }
+                    }, function(error) {
+                        if (angular.isDefined(error.data.error.fields) &amp;&amp; angular.isDefined(error.data.error.fields.unique) &amp;&amp; error.data.error.fields.unique.length !== 0) {
+                            flash.set($filter(&quot;translate&quot;)(&quot;Please choose different &quot; + error.data.error.fields.unique.join()), &#039;error&#039;, false);
+                            $scope.save_btn = false;
+                        } else {
+                            flash.set($filter(&quot;translate&quot;)(&quot;User could not be added. Please, try again&quot;), &#039;error&#039;, false);
+                            $scope.save_btn = false;
+                        }
+                        if ($rootScope.settings.CAPTCHA_TYPE === &#039;Google reCAPTCHA&#039;) {
+                            vcRecaptchaService.reload($scope.widgetId);
+                        }
+                    });
+                }
+            }
+        };
+        $scope.authenticate = function(provider) {
+            $auth.authenticate(provider)
+                .then(function(response) {
+                    $scope.response = response.data;
+                    if ($scope.response.error.code === 0 &amp;&amp; $scope.response.thrid_party_profile) {
+                        $window.localStorage.setItem(&quot;twitter_auth&quot;, JSON.stringify($scope.response));
+                        $state.go(&#039;get_email&#039;);
+                    } else if ($scope.response.access_token) {
+                        $cookies.put(&#039;auth&#039;, JSON.stringify($scope.response), {
+                            path: &#039;/&#039;
+                        });
+                        $cookies.put(&#039;token&#039;, $scope.response.access_token, {
+                            path: &#039;/&#039;
+                        });
+                        $rootScope.user = $scope.response;
+                        $rootScope.$emit(&#039;updateParent&#039;, {
+                            isAuth: true
+                        });
+                        if ($cookies.get(&quot;redirect_url&quot;) !== null &amp;&amp; $cookies.get(&quot;redirect_url&quot;) !== undefined) {
+                            $location.path($cookies.get(&quot;redirect_url&quot;));
+                            $cookies.remove(&#039;redirect_url&#039;);
+                        } else {
+                            $location.path(&#039;/&#039;);
+                        }
+                    }
+                    $uibModalStack.dismissAll();
+                })
+                .catch(function(error) {
+                    console.log(&quot;error in login&quot;, error);
+                });
+        };
+    }]);</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

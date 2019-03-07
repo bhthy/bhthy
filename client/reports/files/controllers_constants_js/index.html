@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - controllers/constants.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>controllers/constants.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">29.69</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">233</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">4.72</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.86</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">angular.module(&#039;getlancerApp.Constant&#039;, [])
+    .constant(&#039;ConstUserRole&#039;, {
+        &#039;Admin&#039;: 1,
+        &#039;User&#039;: 2,
+        &#039;Employer&#039;: 3,
+        &#039;Freelancer&#039;: 4
+    })
+    .constant(&#039;ConstExamStatus&#039;, {
+        &#039;Inprogress&#039;: 1,
+        &#039;Incomplete&#039;: 2,
+        &#039;Passed&#039;: 3,
+        &#039;Failed&#039;: 4,
+        &#039;ExamFeePaymentPending&#039;: 5,
+        &#039;FeePaid/NotStarted&#039;: 6,
+        &#039;SuspendedDuetoTakingOvertime&#039;: 7
+    })
+    .constant(&#039;ConstPaymentGateways&#039;, {
+        &#039;Wallet&#039;: 1,
+        &#039;ZazPay&#039;: 2,
+        &#039;PayPal&#039;: 3
+    })
+    .constant(&#039;ConstDiscountType&#039;, {
+        &#039;Percentage&#039;: 1,
+        &#039;Amount&#039;: 2
+    })
+    .constant(&#039;ConstTransactionType&#039;, {
+        &#039;AmountAddedToWallet&#039;: 1,
+        &#039;AdminAddedAmountToUserWallet&#039;: 2,
+        &#039;AdminDeductedAmountToUserWallet&#039;: 3,
+        &#039;ProjectListingFee&#039;: 4,
+        &#039;ProjectMilestonePaymentPaid&#039;: 5,
+        &#039;ProjectMilestonePaymentReleased&#039;: 6,
+        &#039;ProjectInvoicePayment&#039;: 7,
+        &#039;AmountRefundedToWalletForCanceledProjectPayment&#039;: 8,
+        &#039;ContestListingFee&#039;: 9,
+        &#039;AmountRefundedToWalletForCanceledContest&#039;: 10,
+        &#039;AmountRefundedToWalletForRejectedContest&#039;: 11,
+        &#039;ContestFeaturesUpdatedFee&#039;: 12,
+        &#039;ContestTimeExtendedFee&#039;: 13,
+        &#039;AmountMovedToParticipant&#039;: 14,
+        &#039;JobListingFee&#039;: 15,
+        &#039;QuoteSubscriptionPlan&#039;: 16,
+        &#039;ExamFee&#039;: 17,
+        &#039;WithdrawRequested&#039;: 18,
+        &#039;WithdrawRequestApproved&#039;: 19,
+        &#039;WithdrawRequestRejected&#039;: 20,
+        &#039;WithdrawRequestCommission&#039;: 21,
+        &#039;ProjectMilestonePayment&#039;: 22
+    })
+     .constant(&#039;ProjectStatusConstant&#039;, {
+        &#039;Draft&#039;: 1,
+        &#039;PaymentPending&#039;: 2,
+        &#039;PendingForApproval&#039;: 3,
+        &#039;OpenForBidding&#039;: 4,
+        &#039;BiddingExpired&#039;: 5,
+        &#039;WinnerSelected&#039;: 6,
+        &#039;WaitingForEscrow&#039;: 7,
+        &#039;FundedInEscrow&#039;: 8,
+        &#039;BiddingClosed&#039;: 9,
+        &#039;EmployerCanceled&#039;: 10,
+        &#039;UnderDevelopment&#039;: 11,
+        &#039;MutuallyCanceled&#039;: 12,
+        &#039;CanceledByAdmin&#039;: 13,
+        &#039;FinalReviewPending&#039;: 14,
+        &#039;Completed&#039;: 15,
+        &#039;Closed&#039;: 16
+    })
+    .constant(&#039;ConstQuoteStatuses&#039;, {
+        &#039;New&#039;: 1,
+        &#039;UnderDiscussion&#039;: 2,
+        &#039;Hired&#039;: 3,
+        &#039;Completed&#039;: 4,
+        &#039;NotInterested&#039;: 5,
+        &#039;Closed&#039;: 6,
+        &#039;NotCompleted&#039;: 7
+    })
+    .constant(&#039;TransactionUserMessage&#039;, {
+        1: &#039;Amount added to wallet&#039;,
+        2: &#039;Site admin added amount to your wallet&#039;,
+        3: &#039;Site admin deducted amount from your wallet&#039;,
+        4: &#039;Listing fee paid for project - ##PROJECT_NAME## through ##PAYMENTGATEWAY##&#039;,
+        5: &#039;##USER## paid milestone payment to escrow for project - ##PROJECT## through ##PAYMENTGATEWAY## (Site Commission: ##COMMISSION##)&#039;,
+        6: &#039;##USER## released milestone amount from escrow for project - ##PROJECT## through ##PAYMENTGATEWAY## (Site Commission: ##COMMISSION##)&#039;,
+        7: &#039;##USER## paid invoice for project - ##PROJECT## through ##PAYMENTGATEWAY## (Site Commission: ##COMMISSION##)&#039;,
+        8: &#039;Project amount credited to your wallet due to cancellation of project - ##PROJECT_NAME##&#039;,
+        9: &#039;Listing fee paid for contest - ##CONTEST## through ##PAYMENTGATEWAY##&#039;,
+        10: &#039;Contest amount credited in your wallet due to cancelation of contest - ##CONTEST##&#039;,
+        11: &#039;Contest amount credited in your wallet due to rejection of contest - ##CONTEST##)&#039;,
+        12: &#039;Listing features fee paid for contest - ##CONTEST## through ##PAYMENTGATEWAY##&#039;,
+        13: &#039;Listing time extended fee paid for contest - ##CONTEST## through ##PAYMENTGATEWAY##&#039;,
+        14: &#039;##USER## paid award amount of contest - ##CONTEST## through ##PAYMENTGATEWAY##&#039;,
+        15: &#039;Listing fee paid for job - ##JOB## through ##PAYMENTGATEWAY##&#039;,
+        16: &#039;You have purchased - ##SUBSCRIPTION## subscription plan through ##PAYMENTGATEWAY##&#039;,
+        17: &#039;Fee paid for Exam - ##EXAM## through ##PAYMENTGATEWAY##&#039;,
+        18: &#039;You have requested withdraw amount from your wallet (Initiated)&#039;,
+        19: &#039;Site admin approved your withdraw request and amount credited in your money transfer account&#039;,
+        20: &#039;Site admin rejected your withdraw request.&#039;,
+        21: &#039;Withdrawal fee&#039;,
+        22: &#039;##USER## paid milestone payment to escrow for project - ##PROJECT## through ##PAYMENTGATEWAY## (Site Commission: ##COMMISSION##)&#039;,
+        23: &#039;##USER## paid milestone payment to escrow for project - ##PROJECT## through ##PAYMENTGATEWAY##&#039;,
+        24: &#039;##USER## paid invoice for project - ##PROJECT## through ##PAYMENTGATEWAY##&#039;,
+        25: &#039;##USER## released milestone amount from escrow for project - ##PROJECT## through ##PAYMENTGATEWAY##&#039;,
+    })
+    .constant(&#039;TransactionAdminMessage&#039;, {
+        7: &#039;##USER## posted a contest ##CONTEST## with prize amount ##CONTEST_AMOUNT##. (Listing fee ##SITE_FEE##)&#039;,
+        8: &#039;You have canceled the contest ##CONTEST## posted by ##USER## with prize amount ##CONTEST_AMOUNT##&#039;,
+        9: &#039;You have rejected the contest ##CONTEST## posted by ##USER## with prize amount ##CONTEST_AMOUNT##&#039;,
+        10: &#039;Contest features Update fee paid by ##USER##&#039;,
+        11: &#039;Contest Time Extended fee paid by ##USER##&#039;,
+        12: &#039;Prize amount ##CONTEST_AMOUNT## moved to winner (##OTHERUSER##) for completed contest ##CONTEST##&#039;
+    })
+    .constant(&#039;ConstQuoteBuyOption&#039;, {
+        &#039;Enabled&#039;: 1,
+        &#039;Disabled&#039;: 0
+    })
+    .constant(&#039;Constyear&#039;, {
+        &#039;startyear&#039;: 35
+    })
+    .constant(&#039;ExamStatus&#039;, {
+        &#039;Inprogress&#039;: 1,
+        &#039;Incomplete&#039;: 2,
+        &#039;Passed&#039;: 3,
+        &#039;Failed&#039;: 4,
+        &#039;ExamFeePaymentPending&#039;: 5,
+        &#039;FeePaidOrNotStarted&#039;: 6,
+        &#039;SuspendedDueToTakingOvertime&#039;: 7,
+    })
+    .constant(&#039;ActivityType&#039;, {
+        &#039;MessagePosted&#039;: 1,
+        &#039;ReviewPosted&#039;: 2,
+        &#039;Notification&#039;: 3,
+        &#039;JobOpenStatus&#039;: 4,
+        &#039;JobApply&#039;: 5,
+        &#039;PortfolioPosted&#039;: 6,
+        &#039;FollowerPosted&#039;: 7,
+        &#039;QuoteRequestPosted&#039;: 8,
+        &#039;QuoteBidPosted&#039;: 9,
+        &#039;QuoteBidStatusChanged&#039;: 10,
+        &#039;QuoteBidAmountChanged&#039;: 11,
+        &#039;ProjectOpenStatusChanged&#039;: 12,
+        &#039;ProjectStatusChanged&#039;: 13,
+        &#039;ProjectWinnerSelected&#039;: 14,
+        &#039;ProjectDisputePosted&#039;: 15,
+        &#039;ProjectBidInvoicePosted&#039;: 16,
+        &#039;ProjectBidInvoicePaid&#039;: 17,
+        &#039;MilestonePosted&#039;: 18,
+        &#039;MilestoneStatuschanged&#039;: 19,
+        &#039;ContestStatusChanged&#039;: 20,
+        &#039;ContestPosted&#039;: 21,
+        &#039;ContestUserPosted&#039;: 22,
+        &#039;ProjectMutualCancelAccept&#039;: 23,
+        &#039;ProjectMutualCancelReject&#039;: 24,
+        &#039;ProjectMutualCancelRequest&#039;: 25,
+        &#039;ProjectBidPosted&#039;: 26,
+        &#039;ProjectBidFreelancerWithdrawn&#039;: 27,
+        &#039;ProjectBidStatusChanged&#039;: 28,
+        &#039;PortfolioComment&#039;: 29,
+        &#039;ProjectConversation&#039;: 30,
+        &#039;QuoteConversation&#039;: 31,
+        &#039;ContestConversation&#039;: 32,
+        &#039;QuoteBidNotInterestedStatusChanged&#039;: 34,
+        &#039;ProjectAcceptedToWork&#039;: 35,
+        &#039;ProjectRejectedToWork&#039;: 36,
+        &#039;ProjectAttachmentPosted&#039;: 37,
+        &#039;ProjectDisputeStatusChanged&#039;: 38,
+        &#039;JobStatusChanged&#039;: 39,
+        &#039;BidInvite&#039;: 40,
+        &#039;WithdrawRequested&#039;: 41,
+        &#039;WithdrawRequestStatusChange&#039;: 42
+    })
+    .constant(&#039;QuoteStatus&#039;, {
+        &#039;NewBid&#039;: 1,
+        &#039;UnderDiscussion&#039;: 2,
+        &#039;Hired&#039;: 3,
+        &#039;Completed&#039;: 4,
+        &#039;NotInterested&#039;: 5,
+        &#039;Closed&#039;: 6,
+        &#039;NotCompleted&#039;: 7
+    })
+    .constant(&#039;MilestoneStatus&#039;, {
+        &#039;Pending&#039;: 1,
+        &#039;Approved&#039;: 2,
+        &#039;RequestedForEscrow&#039;: 3,
+        &#039;EscrowFunded&#039;: 4,
+        &#039;Completed&#039;: 5,
+        &#039;RequestedForRelease&#039;: 6,
+        &#039;EscrowReleased&#039;: 7,
+        &#039;Canceled&#039;: 8,
+    })
+     .constant(&#039;ConstJobStatus&#039;, {
+            &#039;Draft&#039;: 1,
+            &#039;Payment pending&#039;: 2,
+            &#039;Waiting for approval &#039;: 3,
+            &#039;Open&#039;: 4,
+            &#039;Canceled by employer&#039;: 5,
+            &#039;Expired&#039;: 6,
+            &#039;Archived&#039;: 7,
+            &#039;Canceled by admin&#039;: 8,
+    })
+     .constant(&#039;ConstWithdrawStatus&#039;, {
+            &#039;pending&#039;: 1,
+            &#039;under process&#039;: 2, 
+            &#039;approved and transferred to your account&#039;: 3,
+            &#039;rejected&#039;: 4,
+    })
+     .constant(&#039;ProjectStatuses&#039;, {
+        &#039;draft&#039;: 1,
+        &#039;payment pending&#039;: 2,
+        &#039;pending for approval&#039;: 3,
+        &#039;open for bidding&#039;: 4,
+        &#039;bidding expired&#039;: 5,
+        &#039;winner selected&#039;: 6,
+        &#039;waiting for escrow&#039;: 7,
+        &#039;funded inEscrow&#039;: 8,
+        &#039;bidding closed&#039;: 9,
+        &#039;employer canceled&#039;: 10,
+        &#039;under development&#039;: 11,
+        &#039;mutually canceled&#039;: 12,
+        &#039;canceled by admin&#039;: 13,
+        &#039;final review pending&#039;: 14,
+        &#039;completed&#039;: 15,
+        &#039;closed&#039;: 16
+    })
+       .constant(&#039;MilestoneStatusConstant&#039;, {
+        &#039;MilestoneSuggested&#039;: 1,
+        &#039;MilestoneSet&#039;: 2,
+        &#039;RequestedforEscrow&#039;: 3,
+        &#039;EscrowFunded&#039;: 4,
+        &#039;Completed&#039;: 5,
+        &#039;RequestedForRelease&#039;: 6,
+        &#039;EscrowReleased&#039;: 7,
+        &#039;Canceled&#039;: 8
+    });</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

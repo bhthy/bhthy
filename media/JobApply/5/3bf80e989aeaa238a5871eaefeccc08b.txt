@@ -1,0 +1,141 @@
+#############################################
+			SERVER CONFIG
+#############################################
+---------------------------------------------
+	NGINX SERVER
+---------------------------------------------
+
+	**** systemctl start nginx.service
+	**** systemctl stop nginx.service
+	**** systemctl restart nginx.service
+	**** systemctl status nginx.service
+
+---------------------------------------------
+	APACHE SERVER
+---------------------------------------------
+
+	**** systemctl start apache2
+	**** systemctl stop apache2
+	**** systemctl restart apache2
+	**** systemctl status apache2
+
+---------------------------------------------
+	PHP
+---------------------------------------------
+
+	**** systemctl start php5.6-fpm.service
+	**** systemctl stop php5.6-fpm.service
+	**** systemctl restart php5.6-fpm.service
+	**** systemctl status php5.6-fpm.service
+
+---------------------------------------------
+	POSTGRES
+---------------------------------------------
+
+	**** systemctl start postgresql.service
+	**** systemctl stop postgresql.service
+	**** systemctl restart postgresql.service
+	**** systemctl status postgresql.service
+
+---------------------------------------------
+	ANGULAR PROJECT INSTALLATION
+---------------------------------------------
+
+	**** npm install
+	**** bower install
+	**** npm install grunt
+	**** npm install grunt-cli
+	**** grunt less
+	**** composer install
+
+#######################################################
+					GIT COMMANDS
+#######################################################
+--------------------------------------------
+	CONFIGURE TOOLING 
+--------------------------------------------
+
+	**** git config --global user.name "[name]"
+	**** git config ---global user.email "[email address]" 
+
+------------------------------------------- 
+	CLONE
+-------------------------------------------
+
+	**** git clone {url}  ----- Downloads the project and its entire version history
+
+------------------------------------------
+	GIT CHECKOUT
+------------------------------------------
+
+	**** git checkout [branch name] ---- Switches to the specific branch and updates the working directory
+
+------------------------------------------
+	GIT CREATE BRANCH
+------------------------------------------
+
+	**** git branch [branch name] ---- Creates the new branch
+
+------------------------------------------
+	GIT DELETE BRANCH 
+------------------------------------------
+
+	**** git branch -d [branch name] ---- Deletes the specific branch
+
+------------------------------------------
+	GIT MERGE BRANCH
+------------------------------------------
+
+	**** git merge [branch] ---- Combines the specific branch history in the current branch
+
+------------------------------------------
+	GIT PULL BRANCH
+------------------------------------------
+
+	**** git pull origin [branch] ---- Downloads bookmark history and incorporate changes
+
+------------------------------------------
+	GIT PUSH BRANCH
+------------------------------------------
+
+	**** git push origin [branch] ---- Uploads all local branch commits to Github
+
+##############################################
+	FOLDER PERMISSION
+##############################################
+
+	**** sudo chmod 0777 -R {path}
+
+##############################################
+ 	EXPORT DATABASE
+##############################################
+
+	**** pg_dump -O -U postgres -W tixbox > "/usr/share/nginx/html/tixbox/client/tixbox.sql" 
+
+
+##############################################
+ 	IMPORT DATABASE
+##############################################
+
+	**** psql -O -U postgres -W tixbox < "/usr/share/nginx/html/tixbox/client/tixbox.sql" 
+
+##############################################
+	SERVER LOGIN
+##############################################
+
+	**** ssh username@hostname
+
+----------------------------------------------
+		Mysql Command
+----------------------------------------------
+
+mysql -u root -p <dbname> < /home/ahsan/Downloads/<sql name>
+
+----------------------------------------------
+		Mysql set global variables query
+----------------------------------------------
+SET GLOBAL sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
+
+
+/home/classescity/classescity04.zip
+
